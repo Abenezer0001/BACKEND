@@ -1,0 +1,92 @@
+import { Router, Request, Response, NextFunction } from 'express';
+import { TableController } from '../controllers/TableController';
+
+const router = Router();
+const controller = new TableController();
+
+// Debug middleware
+const debugMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  console.log('Table Route:', {
+    method: req.method,
+    path: req.path,
+    url: req.url,
+    baseUrl: req.baseUrl,
+    originalUrl: req.originalUrl,
+    params: req.params,
+    body: req.body
+  });
+  next();
+};
+
+// Validation middleware
+const validateIds = (req: Request, res: Response, next: NextFunction): void => {
+  const { restaurantId, venueId, tableId } = req.params;
+  
+  if (restaurantId && !(/^[0-9a-fA-F]{24}$/).test(restaurantId)) {
+    res.status(400).json({ error: 'Invalid restaurant ID format' });
+    return;
+  }
+  
+  if (venueId && !(/^[0-9a-fA-F]{24}$/).test(venueId)) {
+    res.status(400).json({ error: 'Invalid venue ID format' });
+    return;
+  }
+  
+  if (tableId && !(/^[0-9a-fA-F]{24}$/).test(tableId)) {
+    res.status(400).json({ error: 'Invalid table ID format' });
+    return;
+  }
+  
+  next();
+};
+
+// Body validation middleware
+const validateTableBody = (req: Request, res: Response, next: NextFunction): void => {
+  const { number, capacity, type } = req.body;
+  
+  if (!number || typeof number !== 'string') {
+    res.status(400).json({ error: 'Table number is required and must be a string' });
+    return;
+  }
+  
+  // Convert capacity to number if it's a string
+  const capacityNum = typeof capacity === 'string' ? parseInt(capacity, 10) : capacity;
+  
+  if (!capacityNum || typeof capacityNum !== 'number' || capacityNum <= 0 || isNaN(capacityNum)) {
+    res.status(400).json({ error: 'Capacity is required and must be a positive number' });
+    return;
+  }
+  
+  // Update the body with the converted capacity
+  req.body.capacity = capacityNum;
+  
+  if (!type || typeof type !== 'string' || !['REGULAR', 'VIP', 'COUNTER', 'LOUNGE'].includes(type)) {
+    res.status(400).json({ error: 'Table type is required and must be one of: REGULAR, VIP, COUNTER, LOUNGE' });
+    return;
+  }
+  
+  next();
+};
+
+// Apply debug middleware to all routes
+router.use(debugMiddleware);
+
+// Table CRUD routes
+router.route('/restaurant/:restaurantId/venue/:venueId')
+  .post(validateIds, validateTableBody, controller.create.bind(controller));
+
+router.route('/restaurant/:restaurantId/venue/:venueId/tables')
+  .get(validateIds, controller.getAll.bind(controller));
+
+router.route('/restaurant/:restaurantId/venue/:venueId/tables/:tableId')
+  .get(validateIds, controller.getById.bind(controller))
+  .put(validateIds, validateTableBody, controller.update.bind(controller))
+  .delete(validateIds, controller.delete.bind(controller));
+
+// Table QR code routes
+router.route('/restaurant/:restaurantId/venue/:venueId/tables/:tableId/qrcode')
+  .post(validateIds, controller.generateQRCode.bind(controller))
+  .get(validateIds, controller.getQRCode.bind(controller))
+  .delete(validateIds, controller.deleteQRCode.bind(controller));
+
+export default router;
