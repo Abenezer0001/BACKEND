@@ -446,6 +446,60 @@ var TableController = /** @class */ (function () {
             });
         });
     };
+    // Get all tables for a restaurant
+    TableController.prototype.getAllForRestaurant = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var restaurantId, tables, error_9, errorMessage;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        restaurantId = req.params.restaurantId;
+                        return [4 /*yield*/, Table_1.default.find({ restaurantId: restaurantId })];
+                    case 1:
+                        tables = _a.sent();
+                        res.status(200).json(tables);
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_9 = _a.sent();
+                        console.error('Error getting tables for restaurant:', error_9);
+                        errorMessage = error_9 instanceof Error ? error_9.message : 'Unknown error occurred';
+                        res.status(500).json({ message: 'Error getting tables for restaurant', error: error_9.message });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    TableController.prototype.getAllForVenue = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var restaurantId, venueId, tables, error_10, errorMessage;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        restaurantId = req.params.restaurantId;
+                        venueId = req.params.venueId;
+                        return [4 /*yield*/, Table_1.default.find({ 
+                            restaurantId: restaurantId,
+                            venueId: venueId
+                        })];
+                    case 1:
+                        tables = _a.sent();
+                        res.status(200).json(tables);
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_10 = _a.sent();
+                        console.error('Error getting tables for venue:', error_10);
+                        errorMessage = error_10 instanceof Error ? error_10.message : 'Unknown error occurred';
+                        res.status(500).json({ message: 'Error getting tables for venue', error: errorMessage });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return TableController;
 }());
 exports.TableController = TableController;
+//# sourceMappingURL=TableController.js.map

@@ -26,11 +26,11 @@ app.use('/api', orderRouter);
 // Database connection
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/inseat', {
+    await mongoose.connect(process.env.MONGO_URL as string, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     } as any);
-    console.log('MongoDB connected');
+    console.log('MongoDB cronnected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     process.exit(1);
@@ -41,7 +41,7 @@ const connectDB = async () => {
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on pddort ${PORT}`);
     console.log(`WebSocket server initialized`);
   });
 });

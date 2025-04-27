@@ -1,14 +1,15 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { ITableType } from './TableType'; // Import TableType
 
 export interface ITable extends Document {
   number: string;
   venueId: mongoose.Types.ObjectId;
   capacity: number;
-  type: string;
   qrCode: string;
   isOccupied: boolean;
   isActive: boolean;
   menuId?: mongoose.Types.ObjectId;
+  tableTypeId: mongoose.Types.ObjectId | ITableType; // Required reference to TableType
 }
 
 const TableSchema: Schema = new Schema({
@@ -26,11 +27,6 @@ const TableSchema: Schema = new Schema({
     required: true,
     min: 1
   },
-  type: {
-    type: String,
-    required: true,
-    enum: ['REGULAR', 'VIP', 'COUNTER', 'LOUNGE']
-  },
   qrCode: {
     type: String,
     sparse: true
@@ -47,6 +43,11 @@ const TableSchema: Schema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Menu',
     required: false
+  },
+  tableTypeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'TableType',
+    required: true, // Make it required
   }
 }, {
   timestamps: true

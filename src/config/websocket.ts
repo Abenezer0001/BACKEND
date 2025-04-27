@@ -1,80 +1,70 @@
 import { Server as HTTPServer } from 'http';
-import { WebSocket, Server as WebSocketServer } from 'ws';
+import { Server as SocketIOServer, Socket } from 'socket.io';
 // Import Order model and interface from the correct path
 import OrderModel, { IOrder } from '../../services/order-service/src/models/Order';
 
-// Define a type alias for better readability
-type Order = IOrder;
-
-interface ExtendedWebSocket extends WebSocket {
-  isAlive: boolean;
-  userId?: string;
-  userRole?: string;
+export enum WebSocketEvents {
+  CONNECT = 'connection',
+  DISCONNECT = 'disconnect',
+  JOIN_ROOM = 'joinRoom',
+  LEAVE_ROOM = 'leaveRoom',
+  NEW_ORDER = 'newOrder',
+  ORDER_UPDATED = 'orderUpdated',
+  ORDER_CANCELLED = 'orderCancelled',
+  ORDER_ALERT = 'orderAlert',
+  ERROR = 'error'
 }
 
 export class WebSocketManager {
   private static instance: WebSocketManager;
-  private wss: WebSocketServer;
-  private clients: Map<string, ExtendedWebSocket>;
+  private io: SocketIOServer;
   private pingInterval: NodeJS.Timeout;
 
   private constructor(server: HTTPServer) {
-    this.wss = new WebSocketServer({ server });
-    this.clients = new Map();
-    this.setupWebSocket();
+    this.io = new SocketIOServer(server, {
+      cors: {
+        origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
+        methods: ['GET', 'POST'],
+        credentials: true
+      }
+    });
+    
+    this.setupSocketHandlers();
     this.pingInterval = this.startPingInterval();
   }
 
-  private setupWebSocket(): void {
-    this.wss.on('connection', async (ws: WebSocket, request) => {
-      const extWs = ws as ExtendedWebSocket;
-      try {
-        // Set up client properties
-        extWs.isAlive = true;
-        this.clients.set(request.headers['sec-websocket-key'] as string, extWs);
+  private setupSocketHandlers(): void {
+    this.io.on(WebSocketEvents.CONNECT, (socket: Socket) => {
+      console.log(`Client connected: ${socket.id}`);
 
-        console.log(`Client connected: ${request.headers['sec-websocket-key']}`);
+      // Handle room joining (for specific restaurants/tables)
+      socket.on(WebSocketEvents.JOIN_ROOM, (room: string) => {
+        socket.join(room);
+        console.log(`Socket ${socket.id} joined room: ${room}`);
+      });
 
-        // Set up ping-pong
-        extWs.on('pong', () => {
-          extWs.isAlive = true;
-        });
+      // Handle room leaving
+      socket.on(WebSocketEvents.LEAVE_ROOM, (room: string) => {
+        socket.leave(room);
+        console.log(`Socket ${socket.id} left room: ${room}`);
+      });
 
-        // Handle messages
-        extWs.on('message', (data: string) => {
-          console.log('Received:', data);
-        });
+      // Handle disconnection
+      socket.on(WebSocketEvents.DISCONNECT, () => {
+        console.log(`Client disconnected: ${socket.id}`);
+      });
 
-        // Handle client disconnect
-        extWs.on('close', () => {
-          this.clients.delete(request.headers['sec-websocket-key'] as string);
-          console.log(`Client disconnected: ${request.headers['sec-websocket-key']}`);
-        });
-
-        // Send initial connection success message
-        extWs.send(JSON.stringify({
-          type: 'CONNECTION_ESTABLISHED',
-          message: 'Successfully connected to WebSocket server',
-          timestamp: Date.now()
-        }));
-
-      } catch (error) {
-        console.error('WebSocket connection error:', error);
-        extWs.close();
-      }
+      // Handle errors
+      socket.on(WebSocketEvents.ERROR, (error: any) => {
+        console.error(`Socket ${socket.id} error:`, error);
+      });
     });
   }
 
   private startPingInterval(): NodeJS.Timeout {
     return setInterval(() => {
-      this.wss.clients.forEach((ws: WebSocket) => {
-        const extWs = ws as ExtendedWebSocket;
-        if (!extWs.isAlive) {
-          return ws.terminate();
-        }
-        extWs.isAlive = false;
-        ws.ping();
-      });
+      // With Socket.IO, ping/pong is handled automatically
+      console.log(`Active connections: ${this.io.engine.clientsCount}`);
     }, 30000);
   }
 
@@ -87,50 +77,79 @@ export class WebSocketManager {
 
   public static getInstance(): WebSocketManager {
     if (!WebSocketManager.instance) {
-      throw new Error('WebSocketManager not initialized');
+      throw new Error('WebSocketManager not initialized. Call initialize() first.');
     }
     return WebSocketManager.instance;
   }
 
-  public notifyNewOrder(order: Order): void {
-    this.broadcast({
-      type: 'NEW_ORDER',
-      data: order,
-      timestamp: Date.now()
-    });
+  public getSocketIOServer(): SocketIOServer {
+    return this.io;
   }
 
-  public notifyOrderUpdate(order: Order): void {
-    this.broadcast({
-      type: 'ORDER_UPDATE',
-      data: order,
-      timestamp: Date.now()
-    });
+  public notifyNewOrder(order: IOrder): void {
+    try {
+      // Create room keys
+      const restaurantRoom = `restaurant:${order.restaurantId}`;
+      
+      // Convert order to plain object before sending
+      const orderObj = order.toObject ? order.toObject() : order;
+
+      // Emit to restaurant-specific room
+      this.io.to(restaurantRoom).emit(WebSocketEvents.NEW_ORDER, orderObj);
+      
+      console.log(`Emitted new order event to room ${restaurantRoom}`);
+    } catch (error) {
+      console.error('Error notifying about new order:', error);
+    }
+  }
+
+  public notifyOrderUpdate(order: IOrder): void {
+    try {
+      // Create room keys
+      const restaurantRoom = `restaurant:${order.restaurantId}`;
+      const orderRoom = `order:${order._id}`;
+      
+      // Convert order to plain object before sending
+      const orderObj = order.toObject ? order.toObject() : order;
+
+      // Emit to restaurant and order-specific rooms
+      this.io.to([restaurantRoom, orderRoom]).emit(WebSocketEvents.ORDER_UPDATED, orderObj);
+      
+      console.log(`Emitted order update event to rooms ${restaurantRoom} and ${orderRoom}`);
+    } catch (error) {
+      console.error('Error notifying about order update:', error);
+    }
+  }
+
+  public notifyOrderCancellation(order: IOrder): void {
+    try {
+      // Create room keys
+      const restaurantRoom = `restaurant:${order.restaurantId}`;
+      const orderRoom = `order:${order._id}`;
+      
+      // Convert order to plain object before sending
+      const orderObj = order.toObject ? order.toObject() : order;
+
+      // Emit to restaurant and order-specific rooms
+      this.io.to([restaurantRoom, orderRoom]).emit(WebSocketEvents.ORDER_CANCELLED, orderObj);
+      
+      console.log(`Emitted order cancellation event to rooms ${restaurantRoom} and ${orderRoom}`);
+    } catch (error) {
+      console.error('Error notifying about order cancellation:', error);
+    }
   }
 
   public sendOrderAlert(alertData: any): void {
-    this.broadcast({
-      type: 'ORDER_ALERT',
-      data: alertData,
-      timestamp: Date.now()
-    });
-  }
-
-  private broadcast(message: any): void {
-    this.wss.clients.forEach((ws: WebSocket) => {
-      const extWs = ws as ExtendedWebSocket;
-      if (extWs.readyState === WebSocket.OPEN) {
-        extWs.send(JSON.stringify(message));
-      }
-    });
+    this.io.emit(WebSocketEvents.ORDER_ALERT, alertData);
   }
 
   public cleanup(): void {
     clearInterval(this.pingInterval);
-    this.wss.close();
+    this.io.disconnectSockets(true);
+    this.io.close();
   }
 }
 
 export const getWebSocketManager = (): WebSocketManager => {
   return WebSocketManager.getInstance();
-};
+}

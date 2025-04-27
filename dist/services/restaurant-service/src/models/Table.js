@@ -49,11 +49,6 @@ const TableSchema = new mongoose_1.Schema({
         required: true,
         min: 1
     },
-    type: {
-        type: String,
-        required: true,
-        enum: ['REGULAR', 'VIP', 'COUNTER', 'LOUNGE']
-    },
     qrCode: {
         type: String,
         sparse: true
@@ -70,6 +65,11 @@ const TableSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Menu',
         required: false
+    },
+    tableTypeId: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'TableType',
+        required: true, // Make it required
     }
 }, {
     timestamps: true

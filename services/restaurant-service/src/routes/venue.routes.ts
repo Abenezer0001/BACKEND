@@ -23,19 +23,19 @@ const debugMiddleware = (req: Request, res: Response, next: NextFunction) => {
 router.use(debugMiddleware);
 
 // Get all venues (global)
-router.get('/venues', controller.getAllVenues);
+router.get('/', controller.getAllVenues);
 
 // Restaurant-specific venue routes
-router.post('/venues/restaurant/:restaurantId', controller.create);
-router.get('/venues/restaurant/:restaurantId', controller.getAll);
+router.post('/restaurant/:restaurantId', controller.create);
+router.get('/restaurant/:restaurantId', controller.getAll);
 
 // Individual venue routes
-router.get('/venues/:id', controller.getById);
-router.put('/venues/:id', controller.update);
-router.delete('/venues/:id', controller.delete);
+router.get('/:id', controller.getById);
+router.put('/:id', controller.update);
+router.delete('/:id', controller.delete);
 
 // Venue tables routes
-router.get('/venues/:venueId/tables', controller.getTables);
-router.post('/venues/:venueId/tables', controller.createTable);
+router.get('/:venueId/tables', controller.getTables);
+router.post('/:venueId/tables', controller.createTable);
 
 export default router;

@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { RestaurantController } from '../controllers/RestaurantController';
+import { TableController } from '../controllers/TableController';
+import { Request, Response, NextFunction } from 'express';
 
 /**
  * @swagger
@@ -10,6 +12,21 @@ import { RestaurantController } from '../controllers/RestaurantController';
 
 const router = Router();
 const controller = new RestaurantController();
+const tableController = new TableController();
+
+// Debug middleware for tables route
+const debugMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  console.log('Restaurant Tables Route:', {
+    method: req.method,
+    path: req.path,
+    url: req.url,
+    baseUrl: req.baseUrl,
+    originalUrl: req.originalUrl,
+    params: req.params,
+    body: req.body
+  });
+  next();
+};
 
 /**
  * @swagger
@@ -49,6 +66,15 @@ router.delete('/:id', controller.delete.bind(controller));
  *     summary: Get all venues for a restaurant
  */
 router.get('/:restaurantId/venues', controller.getVenues.bind(controller));
+
+/**
+ * @swagger
+ * /{restaurantId}/tables:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get all tables for a restaurant
+ */
+router.get('/:restaurantId/tables', debugMiddleware, tableController.getAllForRestaurant.bind(tableController));
 
 /**
  * @swagger

@@ -9,5 +9,10 @@
     "outDir": "./dist"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "../auth-service"]
+  "exclude": ["node_modules", "../auth-service"],
+  "files.watcherExclude": {
+  "**/node_modules/**": true,
+  "**/.git/**": true
+},
+"typescript.tsserver.maxTsServerMemory": 3072
 } 

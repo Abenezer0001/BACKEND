@@ -1,4 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
+// ISubSubCategory is no longer needed here as MenuItem model handles it
+// import { ISubSubCategory } from '../src/models/SubSubCategory';
+import { IMenuItem } from '../src/models/MenuItem'; // Import the standalone MenuItem interface
 
 export interface IModifierOption extends Document {
   name: string;
@@ -15,31 +18,14 @@ export interface IModifierGroup extends Document {
   options: IModifierOption[];
 }
 
-export interface IMenuItem extends Document {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  modifierGroups: IModifierGroup[];
-  image?: string;
-  preparationTime: number;
-  isAvailable: boolean;
-  allergens: string[];
-  nutritionalInfo?: {
-    calories: number;
-    protein: number;
-    carbohydrates: number;
-    fats: number;
-  };
-}
+// Removed local IMenuItem interface definition. It's now imported.
 
 export interface IMenuCategory extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   description?: string;
-  categories: string[];
-  items: IMenuItem[];
+  categories: string[]; // Keep if needed for menu structure sub-categories
+  items: Types.ObjectId[]; // Array of references to MenuItem documents
   isAvailable: boolean;
   availabilitySchedule?: {
     startTime: string;
@@ -103,43 +89,7 @@ const ModifierGroupSchema: Schema = new Schema({
   options: [ModifierOptionSchema]
 });
 
-const MenuItemSchema: Schema = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  category: {
-    type: String,
-    required: true
-  },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  modifierGroups: [ModifierGroupSchema],
-  image: String,
-  preparationTime: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  isAvailable: {
-    type: Boolean,
-    default: true
-  },
-  allergens: [String],
-  nutritionalInfo: {
-    calories: Number,
-    protein: Number,
-    carbohydrates: Number,
-    fats: Number
-  }
-});
+// Removed embedded MenuItemSchema definition
 
 const MenuCategorySchema: Schema = new Schema({
   name: {
@@ -147,8 +97,11 @@ const MenuCategorySchema: Schema = new Schema({
     required: true
   },
   description: String,
-  categories: [String],
-  items: [MenuItemSchema],
+  categories: [String], // Keep if needed for menu structure sub-categories
+  items: [{ // Array of references
+    type: Schema.Types.ObjectId,
+    ref: 'MenuItem'
+  }],
   isAvailable: {
     type: Boolean,
     default: true
@@ -160,7 +113,9 @@ const MenuCategorySchema: Schema = new Schema({
   }
 });
 
-const MenuSchema: Schema = new Schema({
+// Removed duplicate MenuSchema definition above this line
+
+const MenuSchema: Schema = new Schema({ // Re-added MenuSchema definition
   name: {
     type: String,
     required: true
@@ -180,4 +135,4 @@ const MenuSchema: Schema = new Schema({
   timestamps: true
 });
 
-export default mongoose.model<IMenu>('Menu', MenuSchema);
+export default mongoose.model<IMenu>('Menu', MenuSchema); // Keep the final export using the correct MenuSchema

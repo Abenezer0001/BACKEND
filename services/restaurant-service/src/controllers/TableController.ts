@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/Restaurant';
 import Table, { ITable } from '../models/Table';
+import TableType from '../models/TableType';
 import * as QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
@@ -40,8 +41,8 @@ export class TableController {
       }
 
       // Validate required fields
-      if (!tableData.number || !tableData.capacity || !tableData.type) {
-        res.status(400).json({ error: 'Missing required fields: number, capacity, or type' });
+      if (!tableData.number || !tableData.capacity || !tableData.tableTypeId) {
+        res.status(400).json({ error: 'Missing required fields: number, capacity, or tableTypeId' });
         return;
       }
 
@@ -56,11 +57,27 @@ export class TableController {
         return;
       }
 
+      // Verify that the table type exists and belongs to this restaurant
+      if (!mongoose.Types.ObjectId.isValid(tableData.tableTypeId)) {
+        res.status(400).json({ error: 'Invalid table type ID format' });
+        return;
+      }
+
+      const tableType = await TableType.findOne({
+        _id: tableData.tableTypeId,
+        restaurantId: new mongoose.Types.ObjectId(restaurantId)
+      });
+
+      if (!tableType) {
+        res.status(404).json({ error: 'Table type not found for this restaurant' });
+        return;
+      }
+
       // Create a new table document
       const newTable = new Table({
         number: tableData.number,
         capacity: parseInt(tableData.capacity, 10),
-        type: tableData.type,
+        tableTypeId: new mongoose.Types.ObjectId(tableData.tableTypeId),
         venueId: new mongoose.Types.ObjectId(venueId),
         qrCode: '',
         isOccupied: false,
@@ -89,7 +106,7 @@ export class TableController {
     }
   }
 
-  // Get all tables
+  // Get all tables for a venue
   public async getAll(req: Request, res: Response): Promise<void> {
     try {
       const { restaurantId, venueId } = req.params;
@@ -109,13 +126,56 @@ export class TableController {
       }
       
       // Query tables directly by venueId
-      const tables = await Table.find({ venueId: new mongoose.Types.ObjectId(venueId) });
+      const tables = await Table.find({ venueId: new mongoose.Types.ObjectId(venueId) })
+        .populate('tableTypeId');
       
       res.json(tables);
     } catch (error) {
       console.error('Error getting tables:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({ error: `Error getting tables: ${errorMessage}` });
+    }
+  }
+
+  // Get all tables for a restaurant (across all venues)
+  public async getAllForRestaurant(req: Request, res: Response): Promise<void> {
+    try {
+      const { restaurantId } = req.params;
+      
+      // Check if restaurant exists
+      const restaurant = await Restaurant.findById(restaurantId);
+      if (!restaurant) {
+        res.status(404).json({ error: 'Restaurant not found' });
+        return;
+      }
+
+      // Get all venues for this restaurant
+      const venueIds = restaurant.venues.map(venue => venue.toString());
+      
+      // Query tables for all venues of this restaurant
+      const tables = await Table.find({ 
+        venueId: { $in: venueIds.map(id => new mongoose.Types.ObjectId(id)) } 
+      }).populate('tableTypeId');
+      
+      res.json(tables);
+    } catch (error) {
+      console.error('Error getting all tables for restaurant:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: `Error getting all tables for restaurant: ${errorMessage}` });
+    }
+  }
+
+  // Get all tables across all restaurants (admin only)
+  public async getAllTables(req: Request, res: Response): Promise<void> {
+    try {
+      // Query all tables
+      const tables = await Table.find({}).populate('tableTypeId');
+      
+      res.json(tables);
+    } catch (error) {
+      console.error('Error getting all tables:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: `Error getting all tables: ${errorMessage}` });
     }
   }
 
@@ -136,7 +196,7 @@ export class TableController {
       }
 
       // Get the table from the Table collection
-      const table = await Table.findById(tableId);
+      const table = await Table.findById(tableId).populate('tableTypeId');
       if (!table) {
         res.status(404).json({ error: 'Table not found' });
         return;
@@ -180,12 +240,30 @@ export class TableController {
         return;
       }
 
+      // If tableTypeId is being updated, verify it exists and belongs to this restaurant
+      if (updateData.tableTypeId) {
+        if (!mongoose.Types.ObjectId.isValid(updateData.tableTypeId)) {
+          res.status(400).json({ error: 'Invalid table type ID format' });
+          return;
+        }
+
+        const tableType = await TableType.findOne({
+          _id: updateData.tableTypeId,
+          restaurantId: new mongoose.Types.ObjectId(restaurantId)
+        });
+
+        if (!tableType) {
+          res.status(404).json({ error: 'Table type not found for this restaurant' });
+          return;
+        }
+      }
+
       // Update the table document
       const updatedTable = await Table.findByIdAndUpdate(
         tableId,
         { ...updateData },
         { new: true, runValidators: true }
-      );
+      ).populate('tableTypeId');
 
       res.json(updatedTable);
     } catch (error) {

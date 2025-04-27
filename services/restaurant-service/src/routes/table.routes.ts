@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { TableController } from '../controllers/TableController';
+// Removed Table import as it's no longer needed here
 
 const router = Router();
 const controller = new TableController();
@@ -72,12 +73,19 @@ const validateTableBody = (req: Request, res: Response, next: NextFunction): voi
 router.use(debugMiddleware);
 
 // Table CRUD routes
+// Get all tables for a specific restaurant (across all venues)
+router.route('/restaurant/:restaurantId/tables')
+  .get(validateIds, controller.getAllForRestaurant.bind(controller));
+
+// Create a table within a specific venue
 router.route('/restaurant/:restaurantId/venue/:venueId')
   .post(validateIds, validateTableBody, controller.create.bind(controller));
 
+// Get all tables for a specific venue
 router.route('/restaurant/:restaurantId/venue/:venueId/tables')
   .get(validateIds, controller.getAll.bind(controller));
 
+// Get, Update, Delete a specific table within a venue
 router.route('/restaurant/:restaurantId/venue/:venueId/tables/:tableId')
   .get(validateIds, controller.getById.bind(controller))
   .put(validateIds, validateTableBody, controller.update.bind(controller))

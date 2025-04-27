@@ -58,6 +58,8 @@ const validateTableBody = (req, res, next) => {
 // Apply debug middleware to all routes
 router.use(debugMiddleware);
 // Table CRUD routes
+router.route('/restaurant/:restaurantId/tables')
+    .get(validateIds, controller.getAll.bind(controller));
 router.route('/restaurant/:restaurantId/venue/:venueId')
     .post(validateIds, validateTableBody, controller.create.bind(controller));
 router.route('/restaurant/:restaurantId/venue/:venueId/tables')

@@ -9,6 +9,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = require("../app");
 const Restaurant_1 = __importDefault(require("../../../restaurant-service/src/models/Restaurant"));
 const menu_model_1 = __importDefault(require("../models/menu.model"));
+const TableType_1 = __importDefault(require("../../../restaurant-service/src/models/TableType"));
 describe('Restaurant Service API Tests', () => {
     beforeAll(async () => {
         await mongoose_1.default.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restaurant-test');
@@ -92,11 +93,7 @@ describe('Restaurant Service API Tests', () => {
     describe('Table Endpoints', () => {
         let restaurantId;
         let venueId;
-        const testTable = {
-            number: 'T1',
-            capacity: 4,
-            type: 'REGULAR'
-        };
+        let tableTypeId;
         beforeEach(async () => {
             const restaurant = await Restaurant_1.default.create({
                 name: 'Test Restaurant',
@@ -107,15 +104,32 @@ describe('Restaurant Service API Tests', () => {
             });
             restaurantId = restaurant._id.toString();
             venueId = restaurant.venues[0]._id.toString();
+            const tableType = await TableType_1.default.create({
+                name: 'Standard Table',
+                description: 'Regular table for testing',
+                restaurantId: restaurant._id
+            });
+            tableTypeId = tableType._id.toString();
         });
         test('POST /api/tables - Create table', async () => {
+            const testTable = {
+                number: 'T1',
+                capacity: 4,
+                tableTypeId: tableTypeId
+            };
             const response = await (0, supertest_1.default)(app_1.app)
                 .post(`/api/restaurants/${restaurantId}/venues/${venueId}/tables`)
                 .send(testTable);
             expect(response.status).toBe(201);
             expect(response.body.number).toBe(testTable.number);
+            expect(response.body.tableTypeId).toBe(tableTypeId);
         });
         test('GET /api/tables - Get all tables', async () => {
+            const testTable = {
+                number: 'T1',
+                capacity: 4,
+                tableTypeId: tableTypeId
+            };
             await (0, supertest_1.default)(app_1.app)
                 .post(`/api/restaurants/${restaurantId}/venues/${venueId}/tables`)
                 .send(testTable);
@@ -124,6 +138,27 @@ describe('Restaurant Service API Tests', () => {
             expect(response.status).toBe(200);
             expect(response.body.length).toBe(1);
             expect(response.body[0].number).toBe(testTable.number);
+            expect(response.body[0].tableTypeId).toBeTruthy();
+        });
+        test('GET /api/restaurants/:restaurantId/tables - Get all tables for restaurant', async () => {
+            const testTable = {
+                number: 'T2',
+                capacity: 2,
+                tableTypeId: tableTypeId
+            };
+            await (0, supertest_1.default)(app_1.app)
+                .post(`/api/restaurants/${restaurantId}/venues/${venueId}/tables`)
+                .send(testTable);
+            const response = await (0, supertest_1.default)(app_1.app)
+                .get(`/api/restaurants/${restaurantId}/tables`);
+            expect(response.status).toBe(200);
+            expect(response.body.length).toBeGreaterThan(0);
+            expect(response.body.some((table) => table.number === testTable.number)).toBe(true);
+        });
+        test('GET /api/tables - Get all tables across restaurants', async () => {
+            const response = await (0, supertest_1.default)(app_1.app).get('/api/tables');
+            expect(response.status).toBe(200);
+            expect(Array.isArray(response.body)).toBe(true);
         });
     });
     describe('Menu Endpoints', () => {
