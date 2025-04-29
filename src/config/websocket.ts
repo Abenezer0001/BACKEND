@@ -75,9 +75,11 @@ export class WebSocketManager {
     return WebSocketManager.instance;
   }
 
-  public static getInstance(): WebSocketManager {
-    if (!WebSocketManager.instance) {
-      throw new Error('WebSocketManager not initialized. Call initialize() first.');
+  public static getInstance(server?: HTTPServer): WebSocketManager {
+    if (!WebSocketManager.instance && server) {
+      WebSocketManager.instance = new WebSocketManager(server);
+    } else if (!WebSocketManager.instance) {
+      throw new Error('WebSocketManager not initialized. Call initialize() first or provide a server instance.');
     }
     return WebSocketManager.instance;
   }

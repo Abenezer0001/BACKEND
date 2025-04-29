@@ -1,49 +1,71 @@
-import express from 'express';
-import http from 'http';
-import cors from 'cors';
-import mongoose from 'mongoose';
+import express, { Application } from 'express';
+import { Server as SocketIOServer } from 'socket.io';
 import { createOrderRoutes } from './routes/orderRoutes';
-import { initializeWebSocketServer } from './websocket/WebSocketServer';
-import { OrderController } from './controllers/OrderController';
+import { KafkaConsumerService } from './services/KafkaConsumerService';
+import { OrderSocketService } from './services/OrderSocketService';
+import kafkaService from './config/kafka';
+import WebSocketService from './services/WebSocketService';
 
-// Create Express app
-const app = express();
+let kafkaConsumerService: KafkaConsumerService | null = null;
+let orderSocketService: OrderSocketService | null = null;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+/**
+ * Initialize the order service with the main application
+ * @param app Express application instance
+ * @param io Socket.IO server instance
+ */
+export const initializeOrderService = (app: Application, io: SocketIOServer): void => {
+  console.log('Initializing Order Service...');
 
-// Create HTTP server
-const server = http.createServer(app);
+  // Initialize order socket service
+  orderSocketService = new OrderSocketService(io);
+  orderSocketService.initialize();
 
-// Initialize WebSocket server
-const wsService = initializeWebSocketServer(server);
+  // Set up routes for the order service under /api/orders
+  // Set up routes for the order service under /api/orders
+  const routes = createOrderRoutes(WebSocketService);
+  app.use('/api/orders', routes);
 
-// Set up routes with WebSocket service
-const orderRouter = createOrderRoutes(wsService);
-app.use('/api', orderRouter);
+  // Initialize Kafka consumer
+  kafkaConsumerService = new KafkaConsumerService();
+  kafkaConsumerService.startConsumer()
+    .then(() => {
+      console.log('Kafka consumer started successfully');
+    })
+    .catch((error) => {
+      console.error('Failed to start Kafka consumer:', error);
+    });
 
-// Database connection
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URL as string, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    } as any);
-    console.log('MongoDB cronnected');
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
+  console.log('Order Service initialized successfully');
 };
 
-// Start server
-const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`Server running on pddort ${PORT}`);
-    console.log(`WebSocket server initialized`);
-  });
-});
+/**
+ * Shutdown function for the order service
+ * Gracefully terminates all services
+ */
+export const shutdownOrderService = async (): Promise<void> => {
+  console.log('Shutting down Order Service...');
 
-export { server, app, wsService };
+  // Shutdown Kafka consumer if initialized
+  if (kafkaConsumerService) {
+    try {
+      await kafkaConsumerService.shutdown();
+      console.log('Kafka consumer shut down successfully');
+    } catch (error) {
+      console.error('Error shutting down Kafka consumer:', error);
+    }
+    kafkaConsumerService = null;
+  }
+
+  // Cleanup socket service if initialized
+  if (orderSocketService) {
+    orderSocketService.cleanup();
+    orderSocketService = null;
+    console.log('Order Socket Service cleaned up');
+  }
+
+  console.log('Order Service shutdown complete');
+};
+
+// Export kafka service for external use
+export { kafkaService };

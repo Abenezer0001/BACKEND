@@ -1,26 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { HTTP_STATUS } from '../constants/httpStatus';
-import logger from '../config/logger';
+import logger from '../utils/logger';
 
-// Extend Express Request to include user property
+// Extend Express User interface to include our custom properties
 declare global {
   namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        email: string;
-        role: string;
-        restaurantIds?: string[];
-      };
+    // Extend the User interface instead of Request
+    interface User {
+      id: string;
+      email: string;
+      role: string;
+      restaurantIds?: string[];
     }
   }
 }
 
 interface TokenPayload {
-  userId: string;
+  id: string;
   email: string;
   role: string;
+  restaurantIds?: string[];
   iat?: number;
   exp?: number;
 }
@@ -56,9 +56,10 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
     
     // Attach user info to request
     req.user = {
-      userId: decoded.userId,
+      id: decoded.id,
       email: decoded.email,
-      role: decoded.role
+      role: decoded.role,
+      restaurantIds: decoded.restaurantIds
     };
     
     next();
@@ -80,19 +81,21 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction): v
     // Ensure user is authenticated
     if (!req.user) {
       logger.warn('Admin authorization failed: No user found in request');
-      return res.status(401).json({ error: 'Authentication required' });
+      res.status(401).json({ error: 'Authentication required' });
+      return;
     }
 
     // Check if user has admin role
     if (req.user.role !== 'admin') {
       logger.warn(`Admin authorization failed: User ${req.user.id} with role ${req.user.role} attempted admin access`);
-      return res.status(403).json({ error: 'Admin privileges required' });
+      res.status(403).json({ error: 'Admin privileges required' });
+      return;
     }
 
     next();
   } catch (error) {
     logger.error('Error in admin authorization middleware:', error);
-    return res.status(500).json({ error: 'Internal server error during authorization' });
+    res.status(500).json({ error: 'Internal server error during authorization' });
   }
 };
 
@@ -104,18 +107,20 @@ export const requireStaffOrAdmin = (req: Request, res: Response, next: NextFunct
     // Ensure user is authenticated
     if (!req.user) {
       logger.warn('Staff/Admin authorization failed: No user found in request');
-      return res.status(401).json({ error: 'Authentication required' });
+      res.status(401).json({ error: 'Authentication required' });
+      return;
     }
 
     // Check if user has staff or admin role
     if (req.user.role !== 'staff' && req.user.role !== 'admin') {
       logger.warn(`Staff/Admin authorization failed: User ${req.user.id} with role ${req.user.role} attempted staff/admin access`);
-      return res.status(403).json({ error: 'Staff or admin privileges required' });
+      res.status(403).json({ error: 'Staff or admin privileges required' });
+      return;
     }
 
     next();
   } catch (error) {
     logger.error('Error in staff/admin authorization middleware:', error);
-    return res.status(500).json({ error: 'Internal server error during authorization' });
+    res.status(500).json({ error: 'Internal server error during authorization' });
   }
 }; 

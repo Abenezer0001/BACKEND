@@ -16,7 +16,7 @@ class LiveOrderMonitor {
   private alertsEnabled: boolean = true;
 
   private constructor() {
-    this.wsService = WebSocketService.getInstance();
+    this.wsService = WebSocketService;
   }
 
   /**
@@ -105,7 +105,7 @@ class LiveOrderMonitor {
 
     try {
       // Send alert via WebSocket to the restaurant
-      this.wsService.notifyOrderAlert(orderId, restaurantId, message);
+      this.wsService.notifyOrderAlert(restaurantId, orderId, message);
       
       // Log the alert
       logger.info(`Order alert sent for order ${orderId}: ${message}`);

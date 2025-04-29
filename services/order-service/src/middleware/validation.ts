@@ -4,19 +4,28 @@ import { Types } from 'mongoose';
 import logger from '../utils/logger';
 import { HTTP_STATUS } from '../constants/httpStatus';
 
+// Note: The Request.user interface is already defined in auth.ts
+// No need to redefine it here
+
 /**
  * Middleware to check validation results
  */
 export const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map(error => ({
-      field: error.path,
-      message: error.msg
-    }));
+    const errorMessages = errors.array().map(error => {
+      // Handle different types of validation errors
+      const field = error.type === 'field' ? error.path : 
+                   (error.type === 'unknown_fields' ? error.fields[0]?.path : 'unknown');
+      return {
+        field,
+        message: error.msg
+      };
+    });
     
     logger.warn('Validation error:', { errors: errorMessages });
-    return res.status(400).json({ errors: errorMessages });
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errorMessages });
+    return;
   }
   next();
 };
@@ -162,4 +171,48 @@ export const validateGetOrdersByRestaurant = [
     .custom(isValidObjectId).withMessage('Invalid restaurant ID format'),
   
   validateRequest
-]; 
+];
+
+type DecodedToken = {
+  id: string;
+  email: string;
+  role: string;
+  restaurantIds?: string[];
+  iat?: number;
+  exp?: number;
+};
+
+export const validateToken = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(HTTP_STATUS.UNAUTHORIZED).json({ 
+        message: 'No token provided or invalid token format. Please login.' 
+      });
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+    // JWT verification would happen here
+    // For example with: const decoded = jwt.verify(token, process.env.JWT_SECRET) as DecodedToken;
+    
+    // Example of mock data for development/testing
+    const decoded = { id: 'user123', email: 'user@example.com', role: 'user' } as DecodedToken;
+    
+    // Attach user data to the request
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+      restaurantIds: decoded.restaurantIds
+    };
+    
+    next();
+  } catch (error) {
+    logger.error('Token validation error:', error);
+    res.status(HTTP_STATUS.UNAUTHORIZED).json({ 
+      message: 'Invalid or expired token. Please login again.' 
+    });
+    return;
+  }
+}; 

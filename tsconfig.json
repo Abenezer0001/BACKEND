@@ -17,13 +17,9 @@
       "@/*": ["src/*"],
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./services/restaurant-service/src/types"]
   },
-  "include": ["src/**/*", "services/**/*", "utils/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "files.watcherExclude": {
-  "**/node_modules/**": true,
-  "**/.git/**": true
-},
-"typescript.tsserver.maxTsServerMemory": 3072
+  "include": ["src/**/*", "services/**/*", "utils/**/*", "services/restaurant-service/src/types/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

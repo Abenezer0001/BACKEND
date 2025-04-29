@@ -1,0 +1,98 @@
+# Overview
+Repeat Pay is a dynamic, frequency-based loyalty platform for restaurants. It solves the problem of margin-eroding discounts and ineffective loyalty programs by rewarding customers based on how quickly they return and how much they spend. It's for restaurants seeking smarter customer retention and for customers seeking personalized rewards that scale with their loyalty. The value lies in increasing customer lifetime value for restaurants and providing tangible, escalating benefits for frequent diners.
+
+# Core Features
+- **Dynamic Tiered Discounts:** The core feature. Applies discounts based on the time elapsed since the customer's last visit. Higher frequency = better discount.
+    - *What it does:* Incentivizes rapid return visits.
+    - *Why it's important:* Moves away from static discounts, rewards actual loyalty, drives repeat business.
+    - *How it works:* Tracks visit dates, calculates time difference, applies corresponding discount tier (configurable by restaurant, 3-5 tiers). Resets to the top tier after each visit. Includes an initial first-time discount.
+- **Visit Tracking:** Records customer visit details.
+    - *What it does:* Logs visit date/time, spend amount, and optionally the server.
+    - *Why it's important:* Provides data foundation for loyalty calculations and restaurant analytics.
+    - *How it works:* App/POS records visit info, sends data to the backend Loyalty Service.
+- **Restaurant Discovery:** Allows users to find participating restaurants via the app.
+    - *What it does:* Provides a searchable/filterable directory of restaurants using the loyalty program.
+    - *Why it's important:* Acts as an acquisition channel for restaurants.
+    - *How it works:* Mobile app interfaces with the Restaurant Service API to display listings, details, menus, and available discounts.
+- **Restaurant Analytics:** Provides insights to restaurant operators.
+    - *What it does:* Shows customer demographics, visit frequency, spending habits, server performance, repeat ratios.
+    - *Why it's important:* Enables data-driven decisions for restaurants.
+    - *How it works:* Analytics Service processes data from Visit Tracking and Customer Loyalty records, presents it via a Restaurant Admin Dashboard.
+- **Loyalty Program Configuration:** Allows restaurants to customize their program.
+    - *What it does:* Enables setting custom discount percentages, tier durations, and first-time offers.
+    - *Why it's important:* Provides flexibility for different restaurant business models.
+    - *How it works:* Restaurant admins use the dashboard to interact with the Loyalty Service configuration endpoints.
+- **Payment Processing Integration:** (Optional but described) Enables in-app payments or discount verification.
+    - *What it does:* Facilitates secure payment or applies the calculated discount at checkout.
+    *Why it's important:* Streamlines the redemption process.
+    - *How it works:* Integrates with payment gateways (e.g., Stripe) or provides a verification mechanism for POS systems.
+
+# User Experience
+- **User Personas:**
+    - *Customer:* Diner looking for value, potentially exploring new restaurants, appreciates rewards for loyalty.
+    - *Restaurant Owner/Manager:* Business-focused, wants to increase repeat business, gain customer insights, and move away from ineffective blanket discounts.
+    - *Restaurant Staff:* Needs a simple way to verify and apply customer discounts.
+- **Key User Flows:**
+    - *Customer:* Download app -> Register -> Discover restaurant -> Visit & redeem first-time discount -> Receive notification for next tier -> Return visit (potentially at different tier) -> Redeem tier discount -> Cycle repeats.
+    - *Restaurant:* Sign up -> Configure loyalty tiers/discounts -> Manage profile/menu -> Staff processes customer discounts (via app/POS) -> Monitor analytics dashboard -> Adjust program.
+- **UI/UX Considerations:**
+    - *Customer App:* Clear visualization of current discount tier and expiry, easy restaurant discovery, simple redemption process. Push notifications for tier changes/expirations.
+    - *Restaurant Dashboard:* Intuitive interface for program configuration, clear presentation of analytics data, easy access to visit/transaction history.
+
+# Technical Architecture
+- **System Components:** Microservices architecture (API Gateway, Auth Service, Restaurant Service, Loyalty Service, Payment Service, Analytics Service, Notification Service). Frontend clients (Customer Mobile App - React Native, Restaurant Admin Dashboard - React.js).
+- **Data Models:** MongoDB collections for Users, Restaurants, LoyaltyPrograms, Visits, CustomerLoyalty, Transactions, Menus, MenuItems, Staff. (Detailed schemas available in source doc). Redis used for caching.
+- **APIs and Integrations:** REST APIs exposed via an API Gateway. JWT for authentication. Asynchronous communication via message queue (RabbitMQ). Potential integrations with external payment gateways (e.g., Stripe), push notification services (FCM).
+- **Infrastructure Requirements:** Hosting for Node.js microservices, MongoDB database cluster, Redis instance, potentially AWS S3 for static assets/images, CDN.
+
+# Development Roadmap
+- **MVP Requirements:**
+    - User Authentication (Customer & Restaurant Admin roles).
+    - Basic Restaurant Profile Management (Admin creates/updates).
+    - Loyalty Program Configuration (Admin sets tiers, durations, discounts).
+    - Core Loyalty Logic:
+        - Record customer visits (manual input or simple check-in).
+        - Calculate current discount tier based on last visit time.
+        - Basic display of current discount status in Customer App.
+        - Simple mechanism for Restaurant Staff to verify/apply discount (e.g., display code).
+    - Customer App: View restaurants, view current discount.
+    - Restaurant Dashboard: Configure program, view visits.
+- **Future Enhancements (Phase 2 onwards):**
+    - Full Restaurant Discovery features (search, filters, maps, curated lists).
+    - Enhanced Customer App UX (tier progress visualization, notifications).
+    - Comprehensive Restaurant Analytics Dashboard (charts, reports).
+    - Payment Gateway Integration (in-app payments).
+    - POS Integration for seamless discount redemption.
+    - Staff Performance Tracking features.
+    - Advanced Program Configuration options (e.g., spend-based elements, special promotions).
+    - User Profile enhancements (visit history, preferences).
+    - Notification System (Push, Email, SMS).
+
+# Logical Dependency Chain
+1.  **Foundation:** User Authentication (Auth Service), Basic Restaurant Profiles (Restaurant Service), Database Setup (Schemas for User, Restaurant).
+2.  **Core Loyalty Setup:** Loyalty Program Configuration (Loyalty Service, Restaurant Dashboard UI), Loyalty Program & Customer Loyalty Schemas.
+3.  **MVP Functionality:** Visit Recording (Loyalty Service, possibly simple Customer App UI/Staff action), Tier Calculation Logic (Loyalty Service), Basic Discount Display (Customer App UI).
+4.  **Basic Redemption:** Mechanism for staff to verify/log redemption (Simple Dashboard/App UI).
+5.  **Build-Out:** Restaurant Discovery (Restaurant Service APIs, Customer App UI), Analytics (Analytics Service, Dashboard UI), Payment Integration (Payment Service), Notifications (Notification Service).
+
+# Risks and Mitigations
+- **Technical Challenges:**
+    - *Risk:* Complexity in accurately calculating dynamic tiers, especially handling edge cases and time zones.
+    - *Mitigation:* Thorough unit and integration testing of the Loyalty Service logic. Clear definition of time zone handling. Use robust date/time libraries.
+    - *Risk:* Ensuring scalability of visit tracking and tier calculation under load.
+    - *Mitigation:* Efficient database indexing (e.g., on userId, restaurantId, lastVisitDate). Use caching (Redis) for loyalty program configs and potentially recent user statuses. Design microservices for independent scaling.
+- **Figuring out the MVP that we can build upon:**
+    - *Risk:* MVP scope creep, trying to include too much initially.
+    - *Mitigation:* Strictly adhere to the defined MVP requirements focusing on the core loop: configure -> visit -> calculate tier -> redeem. Defer non-essential features like advanced analytics, payments, full discovery.
+    - *Risk:* MVP is not compelling enough for early adopters (restaurants/customers).
+    - *Mitigation:* Ensure the core value proposition (dynamic discounts) is clearly demonstrable and functional, even in a basic form. Gather early feedback.
+- **Resource Constraints:**
+    - *Risk:* Limited development time/budget impacting feature delivery or quality.
+    - *Mitigation:* Prioritize ruthlessly based on the Development Roadmap and Logical Dependency Chain. Focus on delivering a stable, functional MVP first. Phased rollout of subsequent features.
+- **User Adoption:**
+    - *Risk:* Restaurants hesitant to adopt a new system; Customers not understanding or using the app.
+    - *Mitigation:* Clear onboarding for restaurants, highlighting benefits over traditional discounts. Simple and intuitive customer app UX focusing on the value proposition (getting better discounts). Effective marketing and initial first-time offers.
+
+# Appendix
+- **Research Findings:** Market analysis on restaurant loyalty programs and discounting practices could be included here. (Referenced implicitly in `loyality.txt` intro).
+- **Technical Specifications:** Detailed API documentation, database schema definitions, specific library versions, and code examples are available in the `loyality.txt` source document or linked technical documentation. 

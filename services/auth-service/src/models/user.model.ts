@@ -24,6 +24,8 @@ export interface IUser extends Document {
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
+  // New fields for Google OAuth
+  googleId?: string;
   isRestaurantAdmin(): boolean;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -78,6 +80,12 @@ const UserSchema: Schema = new Schema({
   },
   lastLogin: {
     type: Date
+  },
+  // Add Google OAuth fields
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
   }
 }, {
   timestamps: true

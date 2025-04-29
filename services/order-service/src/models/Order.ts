@@ -248,39 +248,15 @@ const OrderSchema: Schema = new Schema({
   },
   orderType: {
     type: String,
-    enum: ['DINE_IN', 'TAKEOUT', 'DELIVERY'],
-    required: true,
-    index: true
-  },
-  paymentMethod: {
-    type: String
-  },
-  deliveryAddress: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    additionalInfo: String
-  },
-  paidAt: {
-    type: Date
-  },
-  completedAt: {
-    type: Date
-  },
-  statusHistory: {
-    type: [StatusHistorySchema],
-    default: []
-  },
-  alerts: {
-    type: [OrderAlertSchema],
-    default: []
+    enum: ['DINE_IN', 'TAKEAWAY'],
+    required: true
   }
 }, {
   timestamps: true
 });
 
-OrderSchema.pre('save', async function(this: IOrder, next) {
+// Generate order number before saving
+OrderSchema.pre('save', async function(next) {
   if (this.isNew) {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
@@ -324,4 +300,4 @@ OrderSchema.pre('findOneAndUpdate', async function(next) {
   next();
 });
 
-export default mongoose.model<IOrder>('Order', OrderSchema);
+export default mongoose.model<IOrder>('Order', OrderSchema); 

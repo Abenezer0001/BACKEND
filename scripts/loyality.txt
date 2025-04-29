@@ -1,0 +1,1645 @@
+Repeat Pay Loyalty System
+Comprehensive Implementation Guide for Restaurants
+
+Table of Contents
+Introduction to Repeat Pay
+Core Features and Functionality
+Business Benefits
+System Architecture
+Technical Implementation
+Backend Structure
+Frontend Structure
+Database Design
+API Documentation
+Code Examples
+Loyalty Tier Calculation
+Discount Application
+Visit Tracking
+User Flows
+Implementation Guide
+Testing Strategy
+Deployment Considerations
+Security Considerations
+Analytics and Reporting
+Comparison with Similar Systems
+Conclusion
+1. Introduction to Repeat Pay
+Repeat Pay is a dynamic, frequency-based loyalty platform designed specifically for the restaurant industry. Unlike traditional loyalty programs that offer fixed discounts or points systems, Repeat Pay innovates by rewarding customers based on how quickly they return to a restaurant and how much they spend.
+
+Founded in July 2018 in Dubai, UAE, by serial entrepreneur Omer Aslan Gurel along with co-founders Antoine Bruna, Marco Banfi, and Mehmet Edebali Sener, Repeat Pay set out to solve a fundamental problem in the restaurant industry: the addiction to heavy discounting practices that erode margins and fail to build genuine customer loyalty.
+
+The platform creates a win-win scenario by offering restaurants a smarter discount strategy while providing customers with meaningful incentives that increase in value based on their frequency of visits. This approach not only encourages repeat business but also helps restaurants identify and reward their most valuable customers.
+
+Key Information
+Founded: July 2018
+Location: Dubai, UAE
+Industry: Restaurant Technology
+Total Funding: $6.88 Million
+Restaurants: 500+ (as of 2020)
+App Downloads: 60,000+ (as of 2020)
+Team Size: 45 across Dubai and Turkey
+Origin Story
+The idea for Repeat Pay originated during a vacation when founder Omer Gurel jokingly asked a restaurant owner for a discount after dining there for three consecutive evenings. The owner immediately offered a 25% discount with a smile, recognizing the value of a frequent customer. This experience sparked the concept that would become Repeat Pay: rewarding customers based on how frequently they return to a restaurant.
+
+The Problem Repeat Pay Solves
+For Restaurants
+Escaping the cycle of heavy, margin-eroding discounts
+Attracting loyal customers rather than one-time deal hunters
+Lack of customer insights and data
+Difficulty in personalizing offers to individual customers
+Inability to incentivize quicker return visits
+For Customers
+Static, one-size-fits-all loyalty programs
+Rewards that don't scale with loyalty or spending
+Complicated points systems with unclear value
+Limited-time promotions that encourage one-time visits
+Lack of recognition for frequent patronage
+Core Philosophy
+Smart Loyalty
+Moving beyond static discounting to dynamic, behavior-based rewards
+
+Data-Driven Decisions
+Providing restaurants with valuable customer insights to improve operations
+
+Personalized Pricing
+Ensuring the best prices go to the best customers based on their behavior
+
+Accelerated Returns
+Incentivizing customers to return sooner than they naturally would
+
+2. Core Features and Functionality
+Dynamic Loyalty System Overview
+The heart of Repeat Pay is its innovative tiered reward system that dynamically adjusts discounts based on how quickly customers return. This creates a powerful incentive structure that rewards frequent visitors with progressively better discounts.
+
+The Tiered Discount Structure
+Initial Offer
+First Time Discount
+10% OFF
+One-time discount to attract new customers to a restaurant
+
+Tiered Return Discounts
+Available after using the First Time Discount. The sooner the customer returns, the better the discount.
+
+Discount
+30%
+Duration
+1 day
+Highest discount tier for the most loyal customers who return within a day
+
+Discount
+20%
+Duration
+7 days
+Second-highest tier for customers returning within a week
+
+Discount
+10%
+Duration
+14 days
+Medium tier for customers returning within two weeks
+
+Discount
+5%
+Duration
+Unlimited
+Base-level permanent discount that never expires
+
+Note:
+
+Excluding the first-time discount, restaurants can set a minimum of 3 tiers and a maximum of 5 tiers.
+Percentages and durations can be customized based on each restaurant's preferences and business model.
+Tier Progression Logic
+When customers miss a discount window, they automatically fall to the next tier in the sequence.
+
+Example Scenario:
+
+Customer visits Restaurant A and uses 10% first-time discount
+Customer becomes eligible for 30% off if they return within 1 day
+Customer doesn't return within 1 day, so discount drops to 20% for the next 7 days
+If they still don't return, discount drops to 10% for 14 days
+Finally, customer maintains a permanent 5% discount regardless of when they return
+Tier Reset Logic
+After every visit, customers start back at the top tier, creating a continuous incentive to return quickly.
+
+Example Scenario:
+
+Customer visits Restaurant A and receives 10% discount (their current tier)
+After this visit, customer is reset to the top tier (30% for 1 day)
+If they return within 1 day, they get 30% off
+After this visit, they're again reset to 30% for 1 day
+This creates a continuous cycle of incentives
+Core Platform Features
+Restaurant Discovery
+Allows users to search, browse, and discover restaurants with curated collections and filters.
+
+Search by location, cuisine, or name
+Filter by current discount availability
+Curated collections (date night, family-friendly, etc.)
+Restaurant details, menus, and photos
+Dynamic Discounts
+The core loyalty feature that calculates and applies appropriate discount based on visit frequency.
+
+Automatic tier calculation
+Discount expiration tracking
+Tier progression and reset logic
+Discount redemption at restaurant
+Visit Tracking
+Records and analyzes customer visits to drive the loyalty program functionality.
+
+Visit date and time recording
+Spend amount tracking
+Server association (which staff served)
+Visit history and analytics
+Payment Processing
+Enables secure in-app payments or discount verification at the restaurant.
+
+Secure payment methods
+Discount application at checkout
+Transaction history
+Receipt generation
+Restaurant Analytics
+Comprehensive customer data insights for restaurant operators.
+
+Customer demographics and profiles
+Visit frequency patterns
+Spending habits analysis
+Server performance tracking
+Repeat ratio metrics (critical for LTV)
+Program Configuration
+Customization options for restaurants to tailor the loyalty program.
+
+Custom tier discounts and durations
+First-time discount adjustment
+Program activation/deactivation
+Special promotion configuration
+User Experience Flows
+Customer Flow
+Download and install the Repeat Pay app
+Create an account with basic information
+Browse restaurants and discover options
+Select a restaurant and view available first-time discount
+Visit restaurant and redeem first-time discount
+Receive notification of next tier discount (30% for 1 day)
+Return within discount window or fall to next tier
+Cycle continues with each visit resetting to top tier
+Restaurant Flow
+Sign up as restaurant partner on Repeat Pay
+Configure loyalty program tiers and discounts
+Customize restaurant profile, menu, and photos
+Train staff on discount redemption process
+Process customer discounts through app or POS
+Access analytics dashboard to view customer data
+Adjust loyalty program based on performance metrics
+Engage with regular customers identified through platform
+3. Business Benefits
+Advantages for Restaurants
+Increased Customer Return Rate
+The tiered discount system creates a strong incentive for customers to return more quickly than they naturally would, increasing visit frequency and overall revenue.
+
+Higher Customer Lifetime Value
+By encouraging repeat visits and building loyalty, restaurants can significantly increase the long-term value of each customer acquisition.
+
+Smarter Discount Strategy
+Unlike blanket discounts (e.g., 2-for-1 offers) that erode margins indiscriminately, Repeat Pay's system ensures discounts are strategically allocated to reward loyalty.
+
+Customer Data & Insights
+Gain valuable insights into customer behavior, including visit patterns, spending habits, and preferences to inform business decisions.
+
+New Customer Acquisition
+The app doubles as a discovery platform for diners looking for restaurants, helping bring in new customers with the first-time discount offer.
+
+Staff Performance Tracking
+The system tracks which servers attended to which customers, enabling performance evaluation based on customer return rates.
+
+Benefits for Customers
+Personalized Rewards
+Receive discounts that directly reflect loyalty and visit frequency, creating a more personalized experience than generic loyalty programs.
+
+Better Value for Loyalty
+The most loyal customers receive the highest discount percentages, unlike traditional programs where everyone receives the same offers regardless of frequency.
+
+Restaurant Discovery
+The app serves as a discovery platform for finding new restaurants with immediate first-time discount benefits.
+
+No Complex Points System
+The straightforward discount structure eliminates confusing points calculations and unclear redemption values found in many loyalty programs.
+
+Key Performance Metrics
+Metric	Description	Target Improvement	Measurement Method
+Return Visit Time	Average time between customer visits	30-50% reduction	Compare pre-program and post-program intervals
+Visit Frequency	Number of visits per customer per month	40-60% increase	Track monthly visit counts per customer
+Revenue Increase	Overall revenue growth from program participants	15-20% increase	Compare revenue from program users vs. non-users
+Customer Retention	Percentage of customers who return	30-40% improvement	Measure 30/60/90-day return rates
+Average Check Size	Average amount spent per visit	10-15% increase	Track spending trends over time
+New Customer Acquisition	New customers brought in through app	20-30% of total customers	First-time discount redemption tracking
+Repeat Ratio	Proportion of repeat vs. new customers	60:40 repeat to new ratio	Track repeat vs. first-time visits
+Case Study: Restaurant Revenue Impact
+According to Repeat Pay's data, restaurants implementing the platform have experienced up to 18% increase in revenue for transactions processed through the app. This is attributed to three key factors:
+
+Increased Visit Frequency: Customers return 30-50% more frequently than before.
+Higher Average Spend: Despite discounts, the overall spend increases as customers often order more items when receiving a discount.
+Customer Retention: Dramatic improvement in retention rates, with 70% of customers returning within 30 days versus an industry average of 30%.
+4. System Architecture
+High-Level Architecture Overview
+Repeat Pay is built on a modern, microservices-based architecture that enables scalability, resilience, and independent deployment of components. The system follows a multi-tier architecture with dedicated services for different aspects of functionality.
+
+Architectural Diagram
+[Architectural Diagram - Shows the interaction between Mobile Apps, API Gateway, Microservices, and Databases]
+Frontend Layer
+Customer Mobile App (iOS/Android)
+Restaurant Admin Dashboard
+Admin Portal
+API Gateway
+Authentication & Authorization
+Request Routing
+Rate Limiting
+Caching
+Microservices
+Authentication Service
+Restaurant Service
+Loyalty Service
+Payment Service
+Analytics Service
+Architectural Layer	Components	Technologies	Responsibilities
+Client Layer	
+Customer Mobile App
+Restaurant Admin Dashboard
+Admin Portal
+React Native
+React.js
+TypeScript
+Material UI
+User interface rendering
+Data presentation
+User interaction
+State management
+API Gateway	
+Express.js Gateway
+Auth Middleware
+Route Handler
+Node.js
+Express.js
+TypeScript
+JWT
+Request routing
+Authentication
+Rate limiting
+Response caching
+Request/response logging
+Microservices	
+Auth Service
+Restaurant Service
+Loyalty Service
+Order Service
+Payment Service
+Analytics Service
+Notification Service
+Node.js
+Express.js
+TypeScript
+MongoDB drivers
+RabbitMQ
+Business logic implementation
+Data processing
+Domain-specific operations
+Inter-service communication
+Data Layer	
+MongoDB Databases
+Redis Cache
+S3 Storage
+MongoDB
+Redis
+AWS S3
+Mongoose ODM
+Data persistence
+Data retrieval
+Caching
+File storage
+Integration Layer	
+Message Queue
+Event Bus
+External API Integrations
+RabbitMQ
+API Gateway
+Axios
+Asynchronous communication
+Event processing
+External system integration
+Core Services & Components
+Authentication Service
+Manages user authentication, authorization, and account management for both customers and restaurant operators.
+
+Key Responsibilities:
+User registration and login
+JWT token generation and validation
+Role-based access control
+Password management and recovery
+Session management
+APIs:
+POST /auth/register
+POST /auth/login
+POST /auth/refresh-token
+POST /auth/password-reset
+GET /auth/me
+Restaurant Service
+Handles all restaurant-related functionality, including profiles, menus, and restaurant management.
+
+Key Responsibilities:
+Restaurant profile management
+Menu and item management
+Restaurant search and discovery
+Photo and media management
+Operating hours and availability
+APIs:
+GET /restaurants
+GET /restaurants/:id
+POST /restaurants
+PUT /restaurants/:id
+GET /restaurants/:id/menu
+Loyalty Service
+Core service that manages the loyalty program, tier calculation, and discount management.
+
+Key Responsibilities:
+Loyalty program configuration
+Visit tracking and history
+Tier calculation and progression
+Discount generation and validation
+Expiration management
+APIs:
+GET /loyalty/user/:userId/status
+POST /loyalty/visits
+GET /loyalty/discounts/active
+POST /loyalty/discounts/redeem
+GET /loyalty/configuration/:restaurantId
+Payment Service
+Handles payment processing, transaction records, and financial operations.
+
+Key Responsibilities:
+Payment processing
+Transaction recording
+Discount application
+Receipt generation
+Commission calculation
+APIs:
+POST /payments/process
+GET /payments/transactions
+GET /payments/receipts/:id
+POST /payments/refund
+GET /payments/commissions
+Analytics Service
+Provides data analysis, reporting, and insights for both customers and restaurants.
+
+Key Responsibilities:
+Customer behavior analysis
+Visit pattern tracking
+Revenue and discount impact analysis
+Server performance metrics
+Reporting and dashboard data
+APIs:
+GET /analytics/restaurant/:id/overview
+GET /analytics/restaurant/:id/customers
+GET /analytics/restaurant/:id/visits
+GET /analytics/restaurant/:id/servers
+GET /analytics/user/:id/history
+Notification Service
+Manages all communication with users including push notifications, emails, and in-app messages.
+
+Key Responsibilities:
+Push notification delivery
+Email sending
+SMS delivery
+In-app messaging
+Notification preferences
+APIs:
+POST /notifications/push
+POST /notifications/email
+POST /notifications/sms
+GET /notifications/preferences/:userId
+PUT /notifications/preferences/:userId
+Data Flow & Communication
+The system utilizes both synchronous (HTTP) and asynchronous (message queue) communication patterns to ensure reliability and performance:
+
+Synchronous Communication (REST APIs)
+User Authentication: Client → API Gateway → Auth Service
+Restaurant Search: Client → API Gateway → Restaurant Service
+Discount Redemption: Client → API Gateway → Loyalty Service → Restaurant Service
+Payment Processing: Client → API Gateway → Payment Service → External Payment Gateway
+Analytics Dashboard: Client → API Gateway → Analytics Service → Database
+Asynchronous Communication (Event-Driven)
+Visit Recording: Loyalty Service → Visit Recorded Event → Analytics Service
+Discount Expiration: Scheduled Job → Expiration Event → Notification Service
+Payment Confirmation: Payment Service → Payment Confirmed Event → Loyalty Service
+Tier Changes: Loyalty Service → Tier Changed Event → Notification Service
+User Registration: Auth Service → User Created Event → Notification Service
+Scalability Considerations
+The microservice architecture enables horizontal scaling of individual components based on load requirements:
+
+Service Replication: Each microservice can be independently scaled based on demand without affecting other services.
+Database Sharding: Data can be partitioned geographically or by restaurant group to optimize query performance.
+Caching Layer: Redis is used to cache frequently accessed data such as restaurant information and active discounts.
+Load Balancing: Requests are distributed across multiple instances of each service to prevent bottlenecks.
+CDN Integration: Static assets like restaurant images and menus are served through a Content Delivery Network.
+5. Technical Implementation
+Backend Structure
+The backend is built using Node.js with TypeScript, following a microservices architecture. Each service is independently deployable and scalable.
+
+
+Repeat-backend/
+├── services/                # Microservices container
+│   ├── auth-service/        # Handles authentication and authorization
+│   │   ├── src/
+│   │       ├── controllers/ # Request handlers
+│   │       ├── middleware/  # Auth checks, validation
+│   │       ├── models/      # Data models (User, Role)
+│   │       ├── routes/      # API endpoint definitions
+│   │       └── services/    # Business logic
+│   │
+│   ├── restaurant-service/  # Manages restaurants and menus
+│   │   └── src/
+│   │       ├── controllers/
+│   │       ├── models/      # Restaurant, Menu models
+│   │       ├── routes/
+│   │       └── services/
+│   │
+│   ├── loyalty-service/     # Core loyalty program functionality
+│   │   └── src/
+│   │       ├── controllers/
+│   │       ├── models/      # LoyaltyProgram, Visit models
+│   │       ├── routes/
+│   │       └── services/    # Tier calculation, discount logic
+│   │
+│   ├── payment-service/     # Payment processing
+│   │   └── src/
+│   │       ├── controllers/
+│   │       ├── models/      # Transaction, Payment models
+│   │       ├── routes/
+│   │       └── services/    # Payment gateway integration
+│   │
+│   └── analytics-service/   # Data analysis and reporting
+│       └── src/
+│           ├── controllers/
+│           ├── models/
+│           ├── routes/
+│           └── services/    # Data processing, report generation
+│
+├── api-gateway/             # Entry point for all API requests
+│   ├── src/
+│   │   ├── app.ts           # Main Express app setup
+│   │   ├── routes/          # Route definitions and proxying
+│   │   └── middleware/      # Global middleware
+│
+└── utils/                   # Shared utilities
+    ├── logger.ts            # Logging utility
+    ├── rabbitmq.ts          # Message queue setup
+    └── database.ts          # Database connection helpers
+
+                
+Core Libraries & Dependencies
+Express.js: Web framework for building the APIs
+Mongoose: MongoDB ODM for data modeling
+TypeScript: Static typing for JavaScript
+JWT: Authentication token implementation
+Joi: Request validation
+Winston: Logging framework
+RabbitMQ: Message broker for inter-service communication
+Redis: In-memory data store for caching
+Stripe: Payment processing integration
+Firebase Cloud Messaging: Push notifications
+Implementation Best Practices
+Dependency Injection: For testable and loosely coupled code
+Repository Pattern: Abstracting data access logic
+Error Handling: Standardized error responses
+Middleware Chains: For request processing pipelines
+Service Layer: Business logic encapsulation
+DTO Pattern: Data transfer objects for API contracts
+Circuit Breaker: For resilient inter-service communication
+Rate Limiting: Preventing API abuse
+Logging: Structured logs for monitoring and debugging
+Environment Configuration: Via .env files and secrets management
+Key Backend Services Implementation
+Authentication Service
+
+// auth.service.ts
+export class AuthService {
+  constructor(
+    private userRepository: UserRepository,
+    private tokenService: TokenService,
+    private hashService: HashService
+  ) {}
+
+  async register(userData: UserRegistrationDto): Promise {
+    // Check if user already exists
+    const existingUser = await this.userRepository.findByEmail(userData.email);
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+    
+    // Hash password and create user
+    const hashedPassword = await this.hashService.hash(userData.password);
+    const user = await this.userRepository.create({
+      ...userData,
+      password: hashedPassword,
+      role: UserRole.CUSTOMER
+    });
+    
+    // Return user without sensitive information
+    return this.mapToUserDto(user);
+  }
+
+  async login(credentials: LoginDto): Promise {
+    // Find user by email
+    const user = await this.userRepository.findByEmail(credentials.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    // Verify password
+    const isPasswordValid = await this.hashService.compare(
+      credentials.password,
+      user.password
+    );
+    
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    // Generate access and refresh tokens
+    const accessToken = await this.tokenService.generateAccessToken(user);
+    const refreshToken = await this.tokenService.generateRefreshToken(user);
+    
+    return {
+      user: this.mapToUserDto(user),
+      accessToken,
+      refreshToken
+    };
+  }
+  
+  // Other methods: refreshToken, resetPassword, updateProfile, etc.
+}
+
+                        
+Loyalty Service: Tier Calculation
+
+// loyalty.service.ts
+export class LoyaltyService {
+  constructor(
+    private visitRepository: VisitRepository,
+    private loyaltyProgramRepository: LoyaltyProgramRepository,
+    private customerLoyaltyRepository: CustomerLoyaltyRepository,
+    private eventBus: EventBus
+  ) {}
+
+  async calculateCurrentTier(
+    userId: string,
+    restaurantId: string
+  ): Promise {
+    // Get the loyalty program configuration for this restaurant
+    const loyaltyProgram = await this.loyaltyProgramRepository.findByRestaurantId(
+      restaurantId
+    );
+    
+    if (!loyaltyProgram || !loyaltyProgram.isActive) {
+      throw new NotFoundException('No active loyalty program found for this restaurant');
+    }
+    
+    // Get customer's loyalty status
+    let customerLoyalty = await this.customerLoyaltyRepository.findByUserAndRestaurant(
+      userId,
+      restaurantId
+    );
+    
+    // If no record exists, they are a new customer
+    if (!customerLoyalty) {
+      return {
+        discountType: 'first-time',
+        discountPercentage: loyaltyProgram.firstTimeDiscount,
+        expiryDate: null,
+        visitCount: 0
+      };
+    }
+    
+    // If they've already used first-time discount, calculate tier
+    const currentDate = new Date();
+    
+    // Check if they have an unexpired tier discount
+    if (
+      customerLoyalty.nextDiscountExpiry &&
+      customerLoyalty.nextDiscountExpiry > currentDate
+    ) {
+      // Find which tier they are in
+      const currentTier = loyaltyProgram.tiers[customerLoyalty.currentTier];
+      
+      return {
+        discountType: 'tier',
+        discountPercentage: currentTier.discountPercentage,
+        expiryDate: customerLoyalty.nextDiscountExpiry,
+        visitCount: customerLoyalty.visitCount,
+        tierLevel: customerLoyalty.currentTier
+      };
+    }
+    
+    // If their discount expired, they've fallen to the next tier
+    // or to the base tier if they were at the lowest already
+    const newTierIndex = Math.min(
+      customerLoyalty.currentTier + 1,
+      loyaltyProgram.tiers.length - 1
+    );
+    
+    const newTier = loyaltyProgram.tiers[newTierIndex];
+    
+    // Calculate new expiry date based on tier duration
+    // (null for unlimited/permanent tier)
+    let newExpiryDate = null;
+    if (newTier.durationDays) {
+      newExpiryDate = new Date();
+      newExpiryDate.setDate(newExpiryDate.getDate() + newTier.durationDays);
+    }
+    
+    // Update customer loyalty record
+    await this.customerLoyaltyRepository.update(customerLoyalty.id, {
+      currentTier: newTierIndex,
+      nextDiscountExpiry: newExpiryDate
+    });
+    
+    return {
+      discountType: 'tier',
+      discountPercentage: newTier.discountPercentage,
+      expiryDate: newExpiryDate,
+      visitCount: customerLoyalty.visitCount,
+      tierLevel: newTierIndex
+    };
+  }
+  
+  // Other methods: recordVisit, redeemDiscount, etc.
+}
+
+                        
+Frontend Structure
+The frontend consists of two main applications: a React Native mobile app for customers and a React.js web dashboard for restaurants. Both share common components and utilities where appropriate.
+
+
+Repeat-mobile-app/
+├── src/
+│   ├── App.tsx              # Root component
+│   ├── navigation/          # React Navigation setup
+│   │   ├── AppNavigator.tsx # Main navigation flow
+│   │   ├── AuthNavigator.tsx# Authentication screens
+│   │   └── MainNavigator.tsx# Post-login screens
+│   │
+│   ├── screens/             # Screen components
+│   │   ├── auth/            # Authentication screens
+│   │   ├── discover/        # Restaurant discovery
+│   │   ├── restaurant/      # Restaurant details
+│   │   ├── profile/         # User profile
+│   │   └── loyalty/         # Loyalty/rewards screens
+│   │
+│   ├── components/          # Reusable UI components
+│   │   ├── common/          # Generic components
+│   │   ├── restaurant/      # Restaurant-specific components
+│   │   └── loyalty/         # Loyalty-specific components
+│   │
+│   ├── hooks/               # Custom React hooks
+│   ├── services/            # API service calls
+│   ├── store/               # State management
+│   │   ├── slices/          # Redux slices
+│   │   └── index.ts         # Store configuration
+│   │
+│   ├── utils/               # Helper functions
+│   └── assets/              # Images and other static assets
+│
+├── App.tsx                  # Entry point
+└── index.js                 # React Native registration point
+
+                
+Customer Mobile App (React Native)
+Key Technologies:
+React Native for cross-platform mobile development
+Redux Toolkit for state management
+React Navigation for routing
+Axios for API requests
+React Native Maps for location features
+Firebase for push notifications
+AsyncStorage for local storage
+React Native Stripe SDK for payments
+React Native Reanimated for animations
+Main Features:
+Restaurant discovery and search
+Loyalty tier visualization
+Discount redemption
+Visit history and tracking
+User profile management
+Payment processing
+Push notifications for discounts
+Restaurant Dashboard (React.js)
+Key Technologies:
+React.js for web interface
+TypeScript for type safety
+React Router for routing
+Material-UI for component library
+Redux Toolkit for state management
+Recharts for data visualization
+Formik for form handling
+Yup for form validation
+Axios for API requests
+date-fns for date manipulation
+Main Features:
+Customer analytics and insights
+Loyalty program configuration
+Visit and transaction history
+Restaurant profile management
+Menu and item management
+Staff performance tracking
+Revenue and discount reports
+Key Frontend Implementation Examples
+Tier Display Component (React Native)
+
+// LoyaltyTierCard.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { format } from 'date-fns';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { Card, ProgressBar, Button } from '../components/common';
+import { colors, typography } from '../theme';
+
+interface LoyaltyTierCardProps {
+  restaurantId: string;
+  onRedeemPress: () => void;
+}
+
+export const LoyaltyTierCard: React.FC = ({
+  restaurantId,
+  onRedeemPress
+}) => {
+  const { currentTier, isLoading, error } = useSelector(
+    (state: RootState) => state.loyalty
+  );
+  
+  const restaurant = useSelector((state: RootState) =>
+    state.restaurants.entities.find(r => r.id === restaurantId)
+  );
+
+  if (isLoading) {
+    return Loading your rewards...;
+  }
+
+  if (error) {
+    return Error loading loyalty information;
+  }
+
+  if (!currentTier) {
+    return (
+      
+        First Time Discount
+        {restaurant?.firstTimeDiscount || 10}% OFF
+        
+      
+    );
+  }
+
+  // Calculate days remaining if there's an expiry date
+  let timeRemaining = null;
+  if (currentTier.expiryDate) {
+    const today = new Date();
+    const expiry = new Date(currentTier.expiryDate);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    timeRemaining = diffDays > 0 ? `${diffDays} days` : '< 1 day';
+  }
+
+  return (
+    
+      
+        Your Discount
+        Time Remaining
+      
+      
+      
+        {currentTier.discountPercentage}%
+        
+          {timeRemaining || 'Unlimited'}
+        
+      
+      
+      {currentTier.visitCount > 0 && (
+        
+          You've visited {restaurant?.name} {currentTier.visitCount} times
+        
+      )}
+      
+      
+    
+  );
+};
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  title: {
+    ...typography.subtitle,
+    color: colors.textSecondary,
+  },
+  valueContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  discount: {
+    ...typography.h2,
+    color: colors.primary,
+    fontWeight: 'bold',
+  },
+  timeRemaining: {
+    ...typography.h3,
+    fontWeight: 'bold',
+  },
+  visitInfo: {
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: 4,
+  }
+});
+
+                        
+Restaurant Customer Analytics (React Dashboard)
+
+// CustomerAnalytics.tsx
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+  CircularProgress
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+import { analyticsService } from '../../services';
+import { MetricCard, DateRangePicker } from '../../components';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    padding: theme.spacing(3)
+  },
+  card: {
+    height: '100%'
+  },
+  content: {
+    padding: theme.spacing(2)
+  },
+  chartContainer: {
+    height: 360
+  },
+  loading: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%'
+  }
+}));
+
+export const CustomerAnalytics = () => {
+  const classes = useStyles();
+  const { restaurantId } = useParams();
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+    endDate: new Date()
+  });
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const data = await analyticsService.getRestaurantCustomerAnalytics(
+          restaurantId,
+          {
+            startDate: dateRange.startDate.toISOString(),
+            endDate: dateRange.endDate.toISOString()
+          }
+        );
+        setAnalytics(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message || 'Failed to load analytics');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [restaurantId, dateRange]);
+
+  const handleDateRangeChange = (range) => {
+    setDateRange(range);
+  };
+
+  if (loading) {
+    return (
+      
+        
+      
+    );
+  }
+
+  if (error) {
+    return (
+      
+        {error}
+      
+    );
+  }
+
+  return (
+    
+      
+        
+          
+        
+
+        {/* Key Metrics Row */}
+        
+          
+        
+        
+          
+        
+        
+          
+        
+        
+          
+        
+
+        {/* Visit Frequency Chart */}
+        
+          
+            
+              
+                Monthly Visit Frequency
+              
+              
+              
+                
+                  
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                  
+
+                
+              
+            
+          
+        
+
+        {/* Customer Segments */}
+        
+          
+            
+              
+                Customer Segments
+              
+              
+              
+                
+                  
+                    
+                    
+                    
+                    
+                    
+                    
+                  
+
+                
+              
+            
+          
+        
+
+        {/* Additional analytics sections would follow */}
+      
+    
+  );
+};
+
+                        
+Database Design
+The system uses MongoDB as its primary database, with Redis for caching. The following schemas define the core data models.
+
+Collection	Description	Key Fields	Relationships
+users	User accounts for customers and restaurant operators	email, name, password (hashed), role, phoneNumber	Referenced by many other collections
+restaurants	Restaurant profiles and information	name, description, address, cuisineType, images, operatingHours	Owned by users (restaurant owners)
+loyaltyPrograms	Loyalty program configuration for restaurants	restaurantId, firstTimeDiscount, tiers (array), isActive	Belongs to a restaurant
+visits	Records of customer visits to restaurants	userId, restaurantId, visitDate, spendAmount, serverId	Belongs to a user and a restaurant
+customerLoyalty	Tracks customer loyalty status for each restaurant	userId, restaurantId, currentTier, nextDiscountExpiry, visitCount	Belongs to a user and a restaurant
+transactions	Payment transaction records	userId, restaurantId, amount, discountAmount, status, paymentMethod	Belongs to a user and a restaurant
+menus	Restaurant menus	restaurantId, name, description, categories	Belongs to a restaurant
+menuItems	Individual menu items	menuId, name, description, price, image, category	Belongs to a menu
+staff	Restaurant staff records	restaurantId, name, role, employeeId	Belongs to a restaurant
+Schema Definitions (Mongoose)
+User Schema
+
+// User.model.ts
+import mongoose, { Document, Schema } from 'mongoose';
+import { UserRole } from '../types';
+
+export interface UserDocument extends Document {
+  email: string;
+  password: string;
+  name: string;
+  phoneNumber?: string;
+  role: UserRole;
+  birthdate?: Date;
+  avatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    phoneNumber: {
+      type: String,
+      trim: true
+    },
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+      default: UserRole.CUSTOMER
+    },
+    birthdate: {
+      type: Date
+    },
+    avatar: {
+      type: String
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+// Create index for email for faster lookup
+UserSchema.index({ email: 1 });
+
+export const User = mongoose.model('User', UserSchema);
+
+                        
+Loyalty Program Schema
+
+// LoyaltyProgram.model.ts
+import mongoose, { Document, Schema } from 'mongoose';
+
+export interface LoyaltyTier {
+  discountPercentage: number;
+  durationDays: number | null; // null means unlimited/permanent
+  isActive: boolean;
+}
+
+export interface LoyaltyProgramDocument extends Document {
+  restaurantId: mongoose.Types.ObjectId;
+  firstTimeDiscount: number;
+  tiers: LoyaltyTier[];
+  startDate: Date;
+  endDate?: Date;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const LoyaltyTierSchema = new Schema(
+  {
+    discountPercentage: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100
+    },
+    durationDays: {
+      type: Number,
+      min: 0,
+      default: null
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    }
+  },
+  { _id: false }
+);
+
+const LoyaltyProgramSchema = new Schema(
+  {
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Restaurant',
+      required: true
+    },
+    firstTimeDiscount: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+      default: 10
+    },
+    tiers: {
+      type: [LoyaltyTierSchema],
+      required: true,
+      validate: {
+        validator: function(tiers) {
+          return tiers.length >= 3 && tiers.length <= 5;
+        },
+        message: 'Loyalty program must have between 3 and 5 tiers'
+      }
+    },
+    startDate: {
+      type: Date,
+      default: Date.now
+    },
+    endDate: {
+      type: Date
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+// Create index for faster restaurant lookup
+LoyaltyProgramSchema.index({ restaurantId: 1 });
+
+// Ensure only one active loyalty program per restaurant
+LoyaltyProgramSchema.index(
+  { restaurantId: 1, isActive: 1 },
+  { unique: true, partialFilterExpression: { isActive: true } }
+);
+
+export const LoyaltyProgram = mongoose.model(
+  'LoyaltyProgram',
+  LoyaltyProgramSchema
+);
+
+                        
+Customer Loyalty Schema
+
+// CustomerLoyalty.model.ts
+import mongoose, { Document, Schema } from 'mongoose';
+
+export interface CustomerLoyaltyDocument extends Document {
+  userId: mongoose.Types.ObjectId;
+  restaurantId: mongoose.Types.ObjectId;
+  currentTier: number;
+  nextDiscountExpiry: Date | null;
+  visitCount: number;
+  totalSpend: number;
+  lastVisitDate: Date;
+  usedFirstTimeDiscount: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const CustomerLoyaltySchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Restaurant',
+      required: true
+    },
+    currentTier: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0
+    },
+    nextDiscountExpiry: {
+      type: Date,
+      default: null
+    },
+    visitCount: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0
+    },
+    totalSpend: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0
+    },
+    lastVisitDate: {
+      type: Date
+    },
+    usedFirstTimeDiscount: {
+      type: Boolean,
+      default: false
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+// Create compound index for faster lookup
+CustomerLoyaltySchema.index({ userId: 1, restaurantId: 1 }, { unique: true });
+// Index for analytics queries
+CustomerLoyaltySchema.index({ restaurantId: 1, visitCount: -1 });
+
+export const CustomerLoyalty = mongoose.model(
+  'CustomerLoyalty',
+  CustomerLoyaltySchema
+);
+
+                        
+Database Design Considerations
+Indexing Strategy: Appropriate indexes are created for frequently queried fields (userId, restaurantId) to optimize query performance.
+Schema Validation: Mongoose schema validation is used to ensure data integrity (e.g., ensuring loyalty programs have 3-5 tiers).
+Denormalization: Some data is denormalized (e.g., storing visitCount in CustomerLoyalty) to improve read performance for frequently accessed information.
+Compound Indexes: Compound indexes are used where queries commonly filter on multiple fields together.
+Timestamps: All models include automatic timestamp fields (createdAt, updatedAt) for auditing and analytics purposes.
+6. API Documentation
+The Repeat Pay platform exposes a comprehensive REST API that powers both the mobile application and restaurant dashboard. All API endpoints are secured with JWT authentication (except for public endpoints like registration and login).
+
+Authentication API
+Endpoint	Method	Description	Request Body	Response
+/api/auth/register	POST	Create a new user account	
+{
+  "email": "string",
+  "password": "string",
+  "name": "string",
+  "phoneNumber": "string",
+  "birthdate": "string" (optional)
+}
+                                    
+{
+  "user": {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string"
+  }
+}
+                                    
+/api/auth/login	POST	Authenticate user and get tokens	
+{
+  "email": "string",
+  "password": "string"
+}
+                                    
+{
+  "user": {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string"
+  },
+  "accessToken": "string",
+  "refreshToken": "string"
+}
+                                    
+/api/auth/refresh-token	POST	Get new access token using refresh token	
+{
+  "refreshToken": "string"
+}
+                                    
+{
+  "accessToken": "string",
+  "refreshToken": "string"
+}
+                                    
+/api/auth/me	GET	Get current user information	
+Authorization header with JWT
+                                    
+{
+  "user": {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string",
+    "phoneNumber": "string",
+    "birthdate": "string"
+  }
+}
+                                    
+Loyalty API
+Endpoint	Method	Description	Request	Response
+/api/loyalty/status/:restaurantId	GET	Get user's current loyalty status for a restaurant	
+Path param: restaurantId
+Authorization header with JWT
+                                    
+{
+  "discountType": "first-time" | "tier",
+  "discountPercentage": number,
+  "expiryDate": string | null,
+  "visitCount": number,
+  "tierLevel": number (if discount type is "tier")
+}
+                                    
+/api/loyalty/visits	POST	Record a new restaurant visit	
+{
+  "restaurantId": "string",
+  "spendAmount": number,
+  "visitDate": "string",
+  "serverId": "string" (optional)
+}
+                                    
+{
+  "visit": {
+    "id": "string",
+    "restaurantId": "string",
+    "userId": "string",
+    "visitDate": "string",
+    "spendAmount": number
+  },
+  "newStatus": {
+    "discountType": "tier",
+    "discountPercentage": number,
+    "expiryDate": string | null,
+    "visitCount": number,
+    "tierLevel": number
+  }
+}
+                                    
+/api/loyalty/redeem	POST	Redeem a discount	
+{
+  "restaurantId": "string",
+  "amount": number,
+  "discountType": "first-time" | "tier"
+}
+                                    
+{
+  "redemption": {
+    "id": "string",
+    "originalAmount": number,
+    "discountAmount": number,
+    "finalAmount": number,
+    "redemptionCode": "string" (for verification)
+  }
+}
+                                    
+/api/loyalty/history	GET	Get user's visit history	
+Query params:
+- page (default: 1)
+- limit (default: 10)
+- restaurantId (optional)
+Authorization header with JWT
+                                    
+{
+  "visits": [
+    {
+      "id": "string",
+      "restaurantId": "string",
+      "restaurantName": "string",
+      "visitDate": "string",
+      "spendAmount": number,
+      "appliedDiscount": {
+        "percentage": number,
+        "amount": number
+      }
+    }
+  ],
+  "pagination": {
+    "totalItems": number,
+    "totalPages": number,
+    "currentPage": number,
+    "hasNext": boolean,
+    "hasPrev": boolean
+  }
+}
+                                    
+Restaurant API
+Endpoint	Method	Description	Request	Response
+/api/restaurants	GET	Get a list of restaurants	
+Query params:
+- page (default: 1)
+- limit (default: 20)
+- search (optional)
+- cuisine (optional)
+- sort (optional)
+- near (optional, lat,lng)
+- radius (optional, in km)
+                                    
+{
+  "restaurants": [
+    {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "cuisineType": ["string"],
+      "address": { ... },
+      "images": ["string"],
+      "rating": number,
+      "firstTimeDiscount": number
+    }
+  ],
+  "pagination": { ... }
+}
+                                    
+/api/restaurants/:id	GET	Get restaurant details	
+Path param: restaurant id
+                                    
+{
+  "restaurant": {
+    "id": "string",
+    "name": "string",
+    "description": "string",
+    "cuisineType": ["string"],
+    "address": { ... },
+    "contact": { ... },
+    "images": ["string"],
+    "operatingHours": { ... },
+    "rating": number,
+    "firstTimeDiscount": number
+  }
+}
+                                    
+/api/restaurants/:id/menu	GET	Get restaurant menu	
+Path param: restaurant id
+                                    
+{
+  "menu": {
+    "id": "string",
+    "name": "string",
+    "categories": [
+      {
+        "id": "string",
+        "name": "string",
+        "items": [
+          {
+            "id": "string",
+            "name": "string",
+            "description": "string",
+            "price": number,
+            "image": "string"
+          }
+        ]
+      }
+    ]
+  }
+}
+                                    
+/api/restaurants/:id/loyalty	GET	Get restaurant loyalty program details	
+Path param: restaurant id
+                                    
+{
+  "loyaltyProgram": {
+    "id": "string",
+    "firstTimeDiscount": number,
+    "tiers": [
+      {
+        "discountPercentage": number,
+        "durationDays": number,
+        "isActive": boolean
+      }
+    ],
+    "isActive": boolean,
+    "startDate": "string",
+    "endDate": "string" (optional)
+  }
+}
+                                    
+Restaurant Management API (Admin)
+Endpoint	Method	Description	Request	Response
+/api/admin/restaurants	POST	Create a new restaurant (admin only)	
+{
+  "name": "string",
+  "description": "string",
+  "cuisineType": ["string"],
+  "address": { ... },
+  "contact": { ... },
+  "operatingHours": { ... }
+}
+                                    
+{
+  "restaurant": {
+    "id": "string",
+    "name": "string",
+    ... (other restaurant fields)
+  }
+}
+                                    
+/api/admin/restaurants/:id/loyalty	POST	Create or update loyalty program for a restaurant	
+{
+  "firstTimeDiscount": number,
+  "tiers": [
+    {
+      "discountPercentage": number,
+      "durationDays": number,
+      "isActive": boolean
+    }
+  ],
+  "isActive": boolean,
+  "startDate": "string",
+  "endDate": "string" (optional)
+}
+                                    
+{
+  "loyaltyProgram": {
+    "id": "string",
+    "firstTimeDiscount": number,
+    "tiers": [ ... ],
+    "isActive": boolean,
+    "startDate": "string",
+    "endDate": "string" (optional)
+  }
+}
+                                    
+/api/admin/analytics/customers	GET	Get customer analytics for a restaurant	
+Query params:
+- restaurantId (required)
+- startDate (required)
+- endDate (required)
+Authorization header with JWT (restaurant admin)
+                                    
+{
+  "totalCustomers": number,
+  "newCustomers": number,
+  "repeatCustomers": number,
+  "avgVisitFrequency": number,
+  "avgSpend": number,
+  "customerSegments": [ ... ],
+  "monthlyVisits": [ ... ],
+  ... (other analytics metrics)
+}
+                                    
+/api/admin/staff	POST	Add restaurant staff member	
+{
+  "restaurantId": "string",
+  "name": "string",
+  "role": "string",
+  "employeeId": "string"
+}
+                                    
+{
+  "staff": {
+    "id": "string",
+    "restaurantId": "string",
+    "name": "string",
+    "role": "string",
+    "employeeId": "string"
+  }
+}
+                                    
+API Documentation Notes
+Authentication: All endpoints (except public ones like registration and login) require a valid JWT token in the Authorization header.
+Rate Limiting: API endpoints are rate-limited to prevent abuse, with different limits for authenticated vs. unauthenticated requests.
+Error Handling: All endpoints follow a consistent error response format:
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "details": object (optional)
+  }
+}
+                        
