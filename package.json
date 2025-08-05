@@ -17,7 +17,7 @@
     "seed:menu-js": "node src/seedMenu.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.787.0",
+    "@aws-sdk/client-s3": "^3.844.0",
     "@aws-sdk/lib-storage": "^3.787.0",
     "@types/multer": "^1.4.12",
     "@types/swagger-jsdoc": "^6.0.4",
