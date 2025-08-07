@@ -1,7 +1,7 @@
 import WebSocketService from './WebSocketService';
 import { OrderStatus, PaymentStatus } from '../models/Order';
-import { KafkaConsumerService } from './KafkaConsumerService';
-import KafkaProducerService from './KafkaProducerService';
+// import { KafkaConsumerService } from './KafkaConsumerService';
+// import KafkaProducerService from './KafkaProducerService';
 import logger from '../utils/logger';
 
 /**

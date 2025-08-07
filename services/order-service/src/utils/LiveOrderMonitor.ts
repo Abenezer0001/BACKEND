@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import Order, { OrderStatus, PaymentStatus, IOrder } from '../models/Order';
 import WebSocketService from '../services/WebSocketService';
-import KafkaProducerService from '../services/KafkaProducerService';
+// import KafkaProducerService from '../services/KafkaProducerService';
 import logger from '../config/logger';
 
 /**

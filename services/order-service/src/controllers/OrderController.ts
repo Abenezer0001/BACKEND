@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Order, { IOrder, OrderStatus, PaymentStatus } from '../models/Order';
-import KafkaProducerService from '../services/KafkaProducerService';
 import WebSocketService from '../services/WebSocketService';
 import axios from 'axios'; // Added for inventory service integration
 import { INVENTORY_SERVICE_BASE_URL } from '../config/inventoryService'; // Added for inventory service URL
@@ -399,7 +398,7 @@ export class OrderController {
 
         // Publish order created event to Kafka
         try {
-          await KafkaProducerService.publishOrderCreated(populatedOrder);
+          // await KafkaProducerService.publishOrderCreated(populatedOrder);
           console.log('Kafka event published successfully');
         } catch (kafkaError) {
           console.error('Error publishing to Kafka:', kafkaError);
@@ -962,7 +961,7 @@ export class OrderController {
           
           // Publish order status changed event to Kafka
           try {
-            await KafkaProducerService.publishOrderStatusChanged(populatedOrder, previousStatus);
+            // await KafkaProducerService.publishOrderStatusChanged(populatedOrder, previousStatus);
             console.log('Kafka event published');
           } catch (kafkaError) {
             console.error('Kafka event error:', kafkaError);
@@ -1068,7 +1067,7 @@ export class OrderController {
         this.wsService.notifyOrderUpdated(populatedOrder);
 
         // Publish payment status changed event to Kafka
-        await KafkaProducerService.publishPaymentStatusChanged(
+        // await KafkaProducerService.publishPaymentStatusChanged(
           populatedOrder,
           previousPaymentStatus
         );
@@ -1129,7 +1128,7 @@ export class OrderController {
         this.wsService.notifyOrderCancellation(populatedOrder);
 
         // Publish order cancelled event to Kafka
-        await KafkaProducerService.publishOrderCancelled(populatedOrder);
+        // await KafkaProducerService.publishOrderCancelled(populatedOrder);
       }
       
       res.status(200).json(populatedOrder);
@@ -1528,7 +1527,7 @@ export class OrderController {
         this.wsService.notifyOrderUpdated(populatedOrder);
 
         // Publish to Kafka
-        await KafkaProducerService.publishOrderUpdated(populatedOrder);
+        // await KafkaProducerService.publishOrderUpdated(populatedOrder);
       }
       
       res.status(200).json(populatedOrder);
