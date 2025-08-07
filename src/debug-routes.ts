@@ -7,7 +7,7 @@ router.get('/routes', (req, res) => {
         if (middleware.route) {
             routes.push({
                 path: middleware.route.path,
-                methods: Object.keys(middleware.route.methods)
+                methods: middleware.route.methods
             });
         }
     });
