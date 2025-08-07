@@ -1,0 +1,18 @@
+{
+  "restaurantId": "6835b1712a4880e9431bd665",
+  "items": [
+    {
+      "menuItemId": "test-menu-item-id",
+      "name": "Test Burger",
+      "quantity": 1,
+      "price": 9.99,
+      "options": []
+    }
+  ],
+  "total": 9.99,
+  "status": "pending",
+  "paymentStatus": "pending",
+  "customerName": "Test Customer",
+  "tableNumber": "T1",
+  "isGuest": true
+}

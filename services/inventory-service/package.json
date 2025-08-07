@@ -1,0 +1,88 @@
+{
+  "name": "inseat-inventory-service",
+  "version": "1.0.0",
+  "description": "Comprehensive Recipe & Inventory Management System for INSEAT platform",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+  "keywords": [
+    "inventory",
+    "recipe",
+    "restaurant",
+    "cost-management",
+    "supplier",
+    "purchase-orders",
+    "waste-tracking",
+    "analytics"
+  ],
+  "author": "INSEAT Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.0",
+    "date-fns": "^2.30.0",
+    "lodash": "^4.17.21",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "xlsx": "^0.18.5",
+    "sharp": "^0.32.5",
+    "nodemailer": "^6.9.4",
+    "socket.io": "^4.7.2",
+    "redis": "^4.6.7",
+    "agenda": "^5.0.0",
+    "moment": "^2.29.4",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/cors": "^2.8.13",
+    "@types/compression": "^1.7.2",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/multer": "^1.4.7",
+    "@types/uuid": "^9.0.2",
+    "@types/lodash": "^4.14.195",
+    "@types/csv-parser": "^3.0.0",
+    "@types/nodemailer": "^6.4.8",
+    "@types/jest": "^29.5.3",
+    "@types/supertest": "^2.0.12",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3",
+    "eslint": "^8.46.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/inseat/inseat-backend.git",
+    "directory": "services/inventory-service"
+  },
+  "bugs": {
+    "url": "https://github.com/inseat/inseat-backend/issues"
+  },
+  "homepage": "https://github.com/inseat/inseat-backend#readme"
+}

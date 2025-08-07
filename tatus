@@ -1,0 +1,509 @@
+[33mcommit f0523a1648b97d9a9f3f4d86eddbe24054cb3335[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32minventory[m[33m, [m[1;31morigin/inventory[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed Jul 23 00:01:40 2025 +0300
+
+    Update staging deployment workflow to change server path and port configuration
+
+[33mcommit f4fc7468c26aaee6cf955b78ae9c316f553f9b7f[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jul 22 22:37:07 2025 +0300
+
+    Add GitHub Actions workflows for production and staging deployments
+    
+    - Created `deploy-prod.yml` for automated deployment to the production server on pushes to the `prod` branch.
+    - Created `deploy-staging.yml` for automated deployment to the staging server on pushes to the `staging` branch.
+    - Both workflows include steps for code checkout, SSH setup, server configuration, deployment execution, and health verification.
+    
+    These workflows streamline the deployment process, ensuring consistent and reliable updates to both production and staging environments.
+
+[33mcommit 7d5d61507083ded0303cfd33498dc74dc8415317[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jul 22 19:38:33 2025 +0300
+
+    Implement inventory and recipe management enhancements
+    
+    - Removed deprecated cookie entries from cookies.txt for security.
+    - Updated tsconfig.json to exclude the inventory service from TypeScript compilation.
+    - Integrated inventory and analytics services into the main application, ensuring proper initialization and routing.
+    - Added new endpoints for verifying authentication and checking stock levels in the inventory service.
+    - Enhanced recipe management with new handlers for stock deduction and recipe versioning.
+    - Refactored existing routes and controllers for better organization and clarity.
+    
+    This commit lays the groundwork for a more robust inventory and recipe management system, improving overall functionality and maintainability.
+
+[33mcommit 86032a2e9381982f3f29164d8b9d68537885fdf8[m
+Merge: 6577715 8c5e76c
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sun Jul 20 02:47:02 2025 +0300
+
+    Merge remote-tracking branch 'origin/cursor/develop-recipe-and-inventory-management-system-53bc' into inventory
+
+[33mcommit 6577715d4538d2fc9bebdb6a8009fee07483cd6e[m[33m ([m[1;31morigin/staging[m[33m, [m[1;31morigin/prod[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: 2cdebba fe8a31d
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat Jul 19 18:58:10 2025 +0300
+
+    Merge pull request #5 from Achievengine/july
+    
+    Refactor role controller  & loyality
+
+[33mcommit fe8a31d73193ae324f88a09f6a5651847ec8b83e[m[33m ([m[1;31morigin/july[m[33m, [m[1;32mjuly[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat Jul 19 18:47:09 2025 +0300
+
+    refactor role controller  & loyality
+
+[33mcommit 2cdebba08155ec464104af63643e51f00de0f596[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri Jul 18 01:15:41 2025 +0300
+
+    Add waiter call functionality and related routes
+    
+    - Introduced a new WaiterCall model to manage waiter calls with various statuses and reasons.
+    - Implemented WaiterCallController with methods for creating, retrieving, resolving, and canceling waiter calls.
+    - Added validation for waiter call creation and retrieval.
+    - Integrated waiter call routes into the restaurant service for handling API requests related to waiter calls.
+    - Updated index and app files to include waiter call routes for better service organization.
+
+[33mcommit 8c5e76c49c6c3828ba3eabc84b9402acceb33006[m[33m ([m[1;31morigin/cursor/develop-recipe-and-inventory-management-system-53bc[m[33m)[m
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Fri Jul 11 08:43:51 2025 +0000
+
+    Implement comprehensive Recipe & Inventory Management System
+    
+    Co-authored-by: g2880902 <g2880902@umn.edu>
+
+[33mcommit a5829a58d5b94e689e32b4348e8dc2c4bc578031[m
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Fri Jul 11 08:30:01 2025 +0000
+
+    Initialize Taskmaster configuration and development workflow rules
+    
+    Co-authored-by: g2880902 <g2880902@umn.edu>
+
+[33mcommit e6f4df350063e1da9beb411beb8eb51af68f6312[m[33m ([m[1;31morigin/jules_wip_122580948737293552[m[33m, [m[1;32mjules_wip_122580948737293552[m[33m)[m
+Merge: 6eea879 ff74687
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri Jul 11 11:18:58 2025 +0300
+
+    Merge branch 'main' into jules_wip_122580948737293552
+
+[33mcommit ff7468745a32b83f2f4811a11255e612781eb2ce[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jul 8 10:36:05 2025 +0300
+
+    Enhance MenuItemController to include modifier groups in population queries
+    
+    - Added population of 'modifierGroups' in both menu item retrieval methods to provide full details of modifier groups associated with menu items.
+
+[33mcommit 3b0ba991f7187924d72aae93251c45e7e8820023[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jul 8 09:36:05 2025 +0300
+
+    Add profile management functionality
+    
+    - Introduced new routes for updating user profiles and uploading profile images.
+    - Enhanced the user model to include 'profileImage' field.
+    - Implemented image upload handling using multer and integrated with ImageService for S3 uploads.
+    - Added error handling for authentication and validation in profile-related routes.
+
+[33mcommit 5886ec0b301df1a56ec5f2b1412896d23dd684fa[m
+Merge: 2dd31f4 17e6428
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sun Jul 6 20:12:26 2025 +0300
+
+    Merge pull request #3 from Achievengine/test-integrate-all-features
+    
+    Test integrate all features
+
+[33mcommit 17e6428e9d2aa0b069b06424576597ae2d48ad46[m[33m ([m[1;31morigin/test-integrate-all-features[m[33m, [m[1;32mtest-integrate-all-features[m[33m)[m
+Merge: 2dd31f4 9a41345
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sun Jul 6 19:49:26 2025 +0300
+
+    Merge kds-cashier-scheduler into test-integrate-all-features
+    
+    - Resolves conflicts in src/app.ts by combining features from both branches
+    - Integrates webhook functionality, KDS/cashier management, and Sentry monitoring
+    - Preserves AI Chat/TTS features from main branch
+    - Includes enhanced logging and authentication middleware
+    - All new routes and services are now available in the integrated branch
+
+[33mcommit 9a413458e185619b24e22a70850f5f0f68ee0a73[m[33m ([m[1;32mkds-cashier-scheduler[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sun Jul 6 19:35:23 2025 +0300
+
+    Add webhook integration files, including webhook configuration, API response details, and order integration logs. Introduce new scripts for kitchen and cashier management, along with schedule routes and public menu handling. Update package dependencies and enhance authentication middleware for improved access control.
+
+[33mcommit 82ded9f293ef3bd4bb7bde80897cb9673cef87f5[m[33m ([m[1;32mModifiers[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sun Jun 22 02:52:36 2025 +0300
+
+    Add Sentry integration for error monitoring and profiling. Update package dependencies to include Sentry and OpenTelemetry packages. Introduce test endpoints for Sentry error handling in app.ts and create a script for testing Sentry integration.
+
+[33mcommit 2dd31f474c9c1b1e72ca933a9e4cca1823ea974f[m[33m ([m[1;31morigin/demo[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed Jun 18 18:43:34 2025 +0300
+
+    Add AI Chat and Text-to-Speech functionality with comprehensive backend fixes and frontend enhancements. Implement ElevenLabs TTS integration, improved CORS configuration, and robust error handling. New endpoints for TTS and voice management added, along with UI improvements for speaker controls.
+
+[33mcommit 7e5e1e51f51f2540093e00abab21d3bad22f6785[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed Jun 18 13:48:35 2025 +0300
+
+    Add promotion management functionality, including test promotions creation script, API documentation, and debug routes. Implement centralized logging system for better monitoring and error tracking across services.
+
+[33mcommit 4a406663c9141151433b4180a5af79ce0787c15d[m
+Merge: 4f97911 c2c9475
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jun 17 12:36:12 2025 +0300
+
+    Merge remote branch jules_wip_18422312647400677376 into Modifiers
+
+[33mcommit 4f9791113cb93ef9705a2064d1b5d9054ecce4c3[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri Jun 13 08:39:02 2025 +0300
+
+    Refactor authentication middleware across services to use 'authenticateFlexible' for improved guest user support. Update cookie handling to check for multiple token names in auth middleware. Apply flexible authentication to the direct table verification endpoint.
+
+[33mcommit 98afc0af2ba5b2f44106705782a4f8afb7b0fce7[m
+Merge: 4814817 aaff11c
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu Jun 12 11:56:30 2025 +0300
+
+    Merge pull request #1 from Achievengine/RBAC
+    
+    Rbac
+
+[33mcommit aaff11ce4fc6b084aaf9677b79a014c7880d0e2a[m[33m ([m[1;31morigin/RBAC[m[33m, [m[1;32mRBAC[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu Jun 12 11:49:47 2025 +0300
+
+    Add flexible authentication middleware to business routes, implement access control for system and restaurant admins, and create frontend-compatible endpoints for business and user management. Introduce new cookie files for session management.
+
+[33mcommit 3eeb27fbfdc9375726af4fff0fd7363d1a28aab5[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed Jun 11 09:40:36 2025 +0300
+
+    Add authentication middleware to restaurant service routes, implement direct handlers for table management, and enhance business route access control. Update role management and improve error handling in various controllers.
+
+[33mcommit 0d6a771157556ba7f6b160a77959f14d34c65468[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon Jun 9 15:45:42 2025 +0300
+
+    Add business-level RBAC implementation, enhance user and role management, and introduce new services for AI and restaurant management. Update environment variables and package dependencies. Add various utility scripts for testing and data seeding.
+
+[33mcommit 481481774e77d85b32c490b658cdc2daee4e34cb[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Jun 3 10:49:38 2025 +0300
+
+    increase password reset token timeout
+
+[33mcommit 759dd0319804f82db90e7948f24a734f48a8c9e6[m
+Merge: 02d1d34 7b9c66a
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Tue Jun 3 09:49:32 2025 +0300
+
+    Merge branch 'main' of https://github.com/Achievengine/INSEAT-Backend
+
+[33mcommit 02d1d34fb625f843d731c3bf88ca7baac5f70461[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Tue Jun 3 09:49:06 2025 +0300
+
+    increase password reset token expiration to one day
+
+[33mcommit 7b9c66a18fe317cbfeb8aa988eae1d8cbe051953[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon Jun 2 19:13:17 2025 +0300
+
+    refactor menucontroller
+
+[33mcommit 3f3dab0882123ce4e515064ccc9a0df2adb2136c[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon Jun 2 09:33:46 2025 +0300
+
+    Update admin frontend URL and simplify email template styles by removing gradients
+
+[33mcommit d3a2f37994618aea3ad1305d069149123218cd88[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon Jun 2 10:32:19 2025 +0400
+
+    Refactor deployment scripts and configuration; add production Docker Compose file and enhance health checks
+
+[33mcommit 9efb55ac37efe03718a3426cf425ca7f2c0bdecf[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon Jun 2 03:00:02 2025 +0300
+
+    Add flexible authentication middleware and enhance email templates
+
+[33mcommit 6eea879f040813087ef86f6cba1b13ac0cf507be[m
+Author: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>
+Date:   Sun Jun 1 09:21:19 2025 +0000
+
+    feat: Implement Recipe, Inventory, and Yield Management MVP
+    
+    This commit introduces the foundational features for Recipe, Inventory, and Yield Management
+    as outlined in the Product Requirements Document.
+    
+    Key changes include:
+    
+    1.  **New `inventory-service`:**
+        *   Initialized a new service (`services/inventory-service`) with a Node.js/TypeScript setup, Express server, and MongoDB connection.
+        *   Added `package.json` with necessary dependencies (express, mongoose) and dev dependencies (jest, typescript, etc.).
+    
+    2.  **Ingredient Management (in `inventory-service`):**
+        *   Created `Ingredient` model with fields for name, restaurantId, UoM, stock levels, cost price, etc.
+        *   Implemented CRUD APIs for ingredients under `/api/inventory/ingredients`.
+    
+    3.  **Recipe Management (in `inventory-service`):**
+        *   Created `Recipe` model with fields for name, ingredients (referencing Ingredient model), instructions, yield, calculated costs, etc.
+        *   Implemented CRUD APIs for recipes under `/api/inventory/recipes`.
+        *   Integrated automatic recipe cost calculation (`calculatedCost` and `calculatedCostPerPortion`) upon recipe creation and updates.
+    
+    4.  **Stock Transaction Logging (in `inventory-service`):**
+        *   Created `StockTransaction` model to log all changes to ingredient stock levels (e.g., sale deduction, manual adjustments).
+    
+    5.  **Automated Stock Deduction (in `inventory-service`):**
+        *   Implemented an API endpoint (`POST /api/inventory/stock/deduct-for-sale`).
+        *   This endpoint takes a list of sold menu items, retrieves their recipes, and deducts the constituent ingredients from stock, logging each deduction as a stock transaction.
+    
+    6.  **Integration with `restaurant-service`:**
+        *   Modified the `MenuItem` model in `restaurant-service` to add an `activeRecipeId` field, allowing menu items to be linked to their corresponding recipes in `inventory-service`.
+        *   Updated `MenuItemController` in `restaurant-service` to handle this new field in create/update operations.
+    
+    7.  **Integration with `order-service`:**
+        *   Modified `OrderController` in `order-service` to call the `inventory-service`'s stock deduction endpoint when an order's status is updated to `COMPLETED`.
+        *   Added configuration for the inventory service URL.
+        *   Note: `axios` was used for the HTTP call; `package.json` was missing in `order-service` at the time of modification, so `axios` couldn't be formally added as a dependency there. This might require your attention.
+    
+    8.  **Unit Tests (in `inventory-service`):**
+        *   Added initial unit tests for `ingredientService.ts` and `recipeService.ts` using Jest.
+        *   Test cases cover CRUD operations, cost calculation, and stock deduction logic.
+        *   Updated `inventory-service/package.json` with Jest dependencies and a script for running these checks.
+    
+    This work establishes the backend infrastructure for the specified management features.
+    Next steps would involve creating the Admin Dashboard UI components for these features,
+    refining error handling, adding more comprehensive checks (integration, e2e),
+    and addressing the `axios` dependency in `order-service`.
+
+[33mcommit 9daf0415ae0af9b7a1efd9d6d14251323bbb8c31[m
+Author: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>
+Date:   Sun Jun 1 09:20:54 2025 +0000
+
+    Jules was unable to complete the task in time. Please review the work done so far and provide feedback for Jules to continue.
+
+[33mcommit 381c9f6b4155f242b1d14dafa5ee96205b10b700[m[33m ([m[1;31morigin/ai-integration[m[33m)[m
+Merge: 4d988ef f079d46
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu May 29 19:42:22 2025 +0300
+
+    Merge branch 'main' of github.com:Achievengine/INSEAT-Backend
+
+[33mcommit 4d988ef01a2bac219504bfb86fef65e58a5dfbd4[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu May 29 19:41:01 2025 +0300
+
+    live orders
+
+[33mcommit f079d4666962061935d587d45bc331968f59e40b[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed May 28 21:50:25 2025 +0400
+
+    fix  auth  and deployment files
+
+[33mcommit 1346eb892f99199a209d43bb01dadefe26efcd1f[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Wed May 28 20:41:44 2025 +0300
+
+    payment integration. update order controller  and auth0
+
+[33mcommit c2c94756e196b93f1f318883dcf8723ee060efe7[m[33m ([m[1;31morigin/jules_wip_18422312647400677376[m[33m)[m
+Author: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>
+Date:   Wed May 28 15:25:08 2025 +0000
+
+    Jules was unable to complete the task in time. Please review the work done so far and provide feedback for Jules to continue.
+
+[33mcommit 4ca7837fec6502cdfe6c32f5f7d1bdb4aab5d747[m[33m ([m[1;31morigin/promotions[m[33m, [m[1;31morigin/Loyality[m[33m, [m[1;31morigin/Inventory[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat May 24 17:00:51 2025 +0400
+
+    fix  cors
+
+[33mcommit 94e9df7a7d1967de58acc71bf4c1377e9b48dbc2[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu May 22 00:46:36 2025 +0300
+
+    fix auth and cors
+
+[33mcommit ee072991ad7f192e37d00ebf05019756b3a17b7c[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu May 22 01:06:07 2025 +0400
+
+    fix deployment script
+
+[33mcommit 331377be3ca6690ababff73d616016b3772bc723[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue May 20 16:39:21 2025 +0300
+
+    payment integratoins  and refactor
+
+[33mcommit 5c7bc4b472b3b5c620f299bcab2c1c383ed75e15[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 19 09:32:22 2025 +0300
+
+    fix auth middlware
+
+[33mcommit f78e410abee4fcdd908f5e2b9cc6e0bac1d8746a[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 19 10:21:59 2025 +0400
+
+    fix s3 issue
+
+[33mcommit 899750f400969bbe4e5f0418d8b138995d97f7b5[m[33m ([m[1;32mfeature/update-kafka-config[m[33m)[m
+Merge: 2b20b47 d7ed673
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat May 17 21:52:40 2025 +0300
+
+    Merge branch 'main' of github.com:Achievengine/INSEAT-Backend
+
+[33mcommit 2b20b4744c4d4f138d9f7a150f5e1fae4fad8bad[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat May 17 21:42:16 2025 +0300
+
+    fix deployment script
+
+[33mcommit d7ed673f4f032f986cb75c84cffdc5ba223232a8[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Sat May 17 17:57:20 2025 +0300
+
+    s3 test
+
+[33mcommit 899248c139a64715906c9d613be3b41060b17991[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Thu May 15 17:34:52 2025 +0300
+
+    refactor menu controller
+
+[33mcommit 49bdfdce5eaaa0b543008a6fc82ad871d853f02b[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 12 17:10:48 2025 +0400
+
+    fix s3 integration
+
+[33mcommit 44a1c6fb65fe2806bee256a0b891dd93e3b72580[m
+Merge: dc8f715 3d076a1
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 12 16:29:09 2025 +0400
+
+    Merge branch 'main' of github.com:Achievengine/INSEAT-Backend
+
+[33mcommit 3d076a1fa8568c3edc3fab65e77238cf9d183301[m
+Merge: efe8fa7 92b2919
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Mon May 12 10:55:48 2025 +0300
+
+    Merge branch 'menu-integration': Resolve conflicts in auth user management guide
+
+[33mcommit 92b2919c07dc6395c0c947bb5f0ebd0d301d3f6b[m[33m ([m[1;31morigin/menu-integration[m[33m, [m[1;32mmenu-integration[m[33m)[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 12 10:54:02 2025 +0300
+
+    table-menu-integration
+
+[33mcommit dc8f715fa65924420bd1f13494ff81da3bf8c1e4[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Mon May 12 11:40:04 2025 +0400
+
+    Resolve merge conflict in src/app.ts, keeping explicit CORS origins
+
+[33mcommit efe8fa7c9d70cc7bba21b0aac4a947e6046ecf70[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Sun May 11 17:03:37 2025 +0300
+
+    system admin  and restaurant admin create , magic link, set up password , and login
+
+[33mcommit dae377b61a21637797a44a96d336cf6fadd56974[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Sat May 10 19:37:03 2025 +0300
+
+    system admin controller fix and  admin creation
+
+[33mcommit 864f1ba746b905d3578d4433aeb05faade065a5f[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Sat May 10 13:39:02 2025 +0300
+
+    add doc and fix crash
+
+[33mcommit d3ad1b82bb8616bf9c2572fe28e95d035ca6ae2f[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri May 9 23:50:07 2025 +0300
+
+    sys admin
+
+[33mcommit eafc29e7547df6133e6302de81b62e092809c487[m
+Merge: cc56b34 9f846f2
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat May 3 07:28:06 2025 +0300
+
+    Merge branch 'main' of github.com:Achievengine/INSEAT-Backend
+
+[33mcommit cc56b346f8c7fc56030bf7d6cfe64a704e285400[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Sat May 3 07:20:32 2025 +0300
+
+    passport strategy fix
+
+[33mcommit 9f846f20c74b7d246efbff3bfde322137632cf68[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri May 2 20:46:55 2025 +0400
+
+    fix up the dokcer  compoose , dockerfile and  google auth url
+
+[33mcommit b41b03510ae603ab54f3c7d517a4845f46a905af[m
+Merge: 90b5e1e 3abf820
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri May 2 19:11:13 2025 +0300
+
+    Merge branch 'main' of github.com:Achievengine/INSEAT-Backend
+
+[33mcommit 90b5e1e100f0bec279effef0ef4cbd0b4ed62674[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Fri May 2 19:11:02 2025 +0300
+
+    refactor table endpoints
+
+[33mcommit 3abf82009625156ba0e62c8503f580691a49aeb6[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Apr 29 21:41:52 2025 +0400
+
+    Add deployment script and update documentation with automated deployment instructions
+
+[33mcommit 34f8883598f0ca7a5c0de8dc9e768ee7d0db1f2d[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Apr 29 21:34:41 2025 +0400
+
+    Add DEPLOYMENT.md with comprehensive deployment documentation
+
+[33mcommit 1a40b98f1bceb55d80289de65ad6dda4b627eb9f[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Apr 29 18:42:39 2025 +0300
+
+    version 1
+
+[33mcommit 1d9a09fcaee60d45bef88821c39af69aaa58e9ba[m
+Author: Abenezer0001 <abenezer.t@achievengine.com>
+Date:   Tue Apr 29 06:21:02 2025 +0300
+
+    kafka, order service , google authenitcation and multiple other
+
+[33mcommit 5620936560e15f9f342f748b6a5c4fcd4321cfec[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Sun Apr 27 15:19:07 2025 +0300
+
+    refactor
+
+[33mcommit f34c5abb115a0fa081fb79e7a6356dab2ec01d02[m
+Author: Abenu10 <abmlengineer@gmail.com>
+Date:   Mon Mar 24 18:05:03 2025 +0300
+
+    endpoints

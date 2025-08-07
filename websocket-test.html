@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .log-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .log-item {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .log-item.order-created {
+            background-color: #e6ffe6;
+        }
+        .log-item.order-updated {
+            background-color: #e6f2ff;
+        }
+        .log-item.order-cancelled {
+            background-color: #ffe6e6;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        input {
+            padding: 8px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Order Events Test</h1>
+        
+        <div class="controls">
+            <input type="text" id="server-url" value="http://localhost:3001" placeholder="WebSocket Server URL">
+            <input type="text" id="restaurant-id" value="6835b1712a4880e9431bd665" placeholder="Restaurant ID">
+            <button id="connect-btn">Connect</button>
+            <button id="disconnect-btn">Disconnect</button>
+            <button id="ping-btn">Send Ping</button>
+        </div>
+        
+        <div>
+            <strong>Connection Status:</strong> <span id="connection-status">Disconnected</span>
+        </div>
+        
+        <h3>Event Log</h3>
+        <div class="log-container" id="log-container"></div>
+        
+        <div>
+            <button id="clear-log-btn">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        
+        // DOM elements
+        const connectBtn = document.getElementById('connect-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const pingBtn = document.getElementById('ping-btn');
+        const clearLogBtn = document.getElementById('clear-log-btn');
+        const serverUrlInput = document.getElementById('server-url');
+        const restaurantIdInput = document.getElementById('restaurant-id');
+        const connectionStatusElement = document.getElementById('connection-status');
+        const logContainer = document.getElementById('log-container');
+        
+        // Log message to UI
+        function log(message, type = '') {
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${type}`;
+            
+            // Add timestamp
+            const timestamp = new Date().toLocaleTimeString();
+            logItem.innerHTML = `<strong>${timestamp}</strong>: ${message}`;
+            
+            logContainer.appendChild(logItem);
+            logContainer.scrollTop = logContainer.scrollHeight; // Auto-scroll to bottom
+        }
+        
+        // Connect to WebSocket server
+        function connect() {
+            if (socket) {
+                log('Already connected, disconnecting first...');
+                socket.disconnect();
+            }
+            
+            const serverUrl = serverUrlInput.value.trim();
+            const restaurantId = restaurantIdInput.value.trim();
+            
+            if (!serverUrl) {
+                log('Server URL is required', 'error');
+                return;
+            }
+            
+            try {
+                log(`Connecting to ${serverUrl}...`);
+                
+                // Connect to Socket.IO server
+                socket = io(serverUrl, {
+                    transports: ['websocket', 'polling'],
+                    reconnection: true,
+                    reconnectionAttempts: 5,
+                    reconnectionDelay: 1000,
+                    reconnectionDelayMax: 5000,
+                    timeout: 20000,
+                    withCredentials: true
+                });
+                
+                // Connection events
+                socket.on('connect', () => {
+                    connectionStatusElement.textContent = 'Connected';
+                    connectionStatusElement.style.color = 'green';
+                    log(`Connected to server with socket ID: ${socket.id}`);
+                    
+                    // Join restaurant room if ID is provided
+                    if (restaurantId) {
+                        log(`Joining room: restaurant:${restaurantId}`);
+                        socket.emit('joinRoom', `restaurant:${restaurantId}`);
+                    }
+                });
+                
+                socket.on('disconnect', (reason) => {
+                    connectionStatusElement.textContent = 'Disconnected';
+                    connectionStatusElement.style.color = 'red';
+                    log(`Disconnected: ${reason}`);
+                });
+                
+                socket.on('connect_error', (error) => {
+                    connectionStatusElement.textContent = 'Connection Error';
+                    connectionStatusElement.style.color = 'red';
+                    log(`Connection error: ${error.message}`);
+                });
+                
+                // Welcome message
+                socket.on('welcome', (data) => {
+                    log(`Received welcome message: ${data.message}`);
+                });
+                
+                // Pong response
+                socket.on('pong', (data) => {
+                    log(`Received pong: ${JSON.stringify(data)}`);
+                });
+                
+                // Order events
+                socket.on('orderCreated', (data) => {
+                    log(`New order received: ${JSON.stringify(data, null, 2)}`, 'order-created');
+                });
+                
+                socket.on('orderUpdated', (data) => {
+                    log(`Order updated: ${JSON.stringify(data, null, 2)}`, 'order-updated');
+                });
+                
+                socket.on('orderCancelled', (data) => {
+                    log(`Order cancelled: ${JSON.stringify(data, null, 2)}`, 'order-cancelled');
+                });
+                
+                socket.on('orderCompleted', (data) => {
+                    log(`Order completed: ${JSON.stringify(data, null, 2)}`, 'order-completed');
+                });
+                
+                socket.on('orderAlert', (data) => {
+                    log(`Order alert: ${JSON.stringify(data, null, 2)}`, 'order-alert');
+                });
+                
+            } catch (error) {
+                log(`Error creating socket: ${error.message}`, 'error');
+            }
+        }
+        
+        // Disconnect from WebSocket server
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                connectionStatusElement.textContent = 'Disconnected';
+                connectionStatusElement.style.color = 'red';
+                log('Manually disconnected from server');
+            } else {
+                log('Not connected');
+            }
+        }
+        
+        // Send ping to server
+        function sendPing() {
+            if (!socket || !socket.connected) {
+                log('Not connected to server', 'error');
+                return;
+            }
+            
+            log('Sending ping to server...');
+            socket.emit('ping', (response) => {
+                log(`Ping response: ${JSON.stringify(response)}`);
+            });
+        }
+        
+        // Clear log
+        function clearLog() {
+            logContainer.innerHTML = '';
+            log('Log cleared');
+        }
+        
+        // Event listeners
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        pingBtn.addEventListener('click', sendPing);
+        clearLogBtn.addEventListener('click', clearLog);
+        
+        // Initial log message
+        log('WebSocket test page loaded. Click "Connect" to start.');
+    </script>
+</body>
+</html>

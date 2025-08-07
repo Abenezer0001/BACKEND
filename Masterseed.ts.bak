@@ -1,0 +1,895 @@
+/**
+ * INSEAT Backend Database Seed Script
+ *
+ * This script populates all models in the INSEAT Backend with sample data,
+ * creating proper relationships between entities.
+ */
+
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const { faker } = require('@faker-js/faker');
+const dotenv = require('dotenv');
+
+dotenv.config(); // Load .env variables
+
+// --- Import Models (Adjust paths as necessary) ---
+const User = require('../services/auth-service/models/user.model');
+const Role = require('../services/auth-service/models/role.model');
+const Permission = require('../services/auth-service/models/permission.model');
+const Restaurant = require('../services/restaurant-service/models/Restaurant');
+const Venue = require('../services/restaurant-service/models/Venue');
+const Zone = require('../services/restaurant-service/models/Zone');
+const TableType = require('../services/restaurant-service/models/TableType');
+const Table = require('../services/restaurant-service/models/Table');
+const Category = require('../services/restaurant-service/models/Category');
+const SubCategory = require('../services/restaurant-service/models/SubCategory');
+const SubSubCategory = require('../services/restaurant-service/models/SubSubCategory');
+const Menu = require('../services/restaurant-service/models/Menu');
+const MenuItem = require('../services/restaurant-service/models/MenuItem');
+const Modifier = require('../services/restaurant-service/models/Modifier');
+const Order = require('../services/order-service/models/Order'); // Assuming path
+const Payment = require('../services/payment-service/models/payment.model'); // Assuming path
+const Notification = require('../services/notification-service/models/notification.model'); // Assuming path
+
+
+// --- Configuration ---
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://abenezer:YXVC8lBaPIcb2o3s@cluster0.oljifwd.mongodb.net/inseat?retryWrites=true&w=majority&appName=Cluster0";
+const SALT_ROUNDS = 10;
+const NUM_TABLES_PER_VENUE_APPROX = 40; // Target approx, adjusted by venue capacity
+const NUM_MENU_ITEMS_PER_SUB_SUB_CATEGORY = 5;
+
+// --- Helper Functions ---
+const getRandomElement = (arr) => {
+  if (!arr || arr.length === 0) return undefined;
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+const getRandomSubset = (arr, maxCount) => {
+    if (!arr || arr.length === 0) return [];
+    const count = Math.floor(Math.random() * (maxCount + 1)); // 0 to maxCount items
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+};
+
+const getPlaceholderImage = (category = 'food', width = 640, height = 480) => {
+    // Using Pexels via LoremFlickr as faker's direct pexels might be unstable
+    // return `https://images.pexels.com/photos/${faker.number.int({ min: 800000, max: 1200000 })}/pexels-photo-${faker.number.int({ min: 800000, max: 1200000 })}.jpeg?auto=compress&cs=tinysrgb&w=${width}&h=${height}&dpr=1`;
+     return faker.image.urlLoremFlickr({ category, width, height }); // More reliable
+}
+
+
+// --- Database Connection with Retry Logic ---
+const connectWithRetry = async (retries = 5, delay = 5000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      console.log(`Attempting to connect to MongoDB Atlas (attempt ${i + 1}/${retries})...`);
+      await mongoose.connect(MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 10000, // Timeout after 10 seconds
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      });
+      console.log('Successfully connected to MongoDB Atlas');
+      return true;
+    } catch (err) {
+      console.error(`Failed to connect to MongoDB (attempt ${i + 1}/${retries}):`, err.message);
+      if (i < retries - 1) {
+        console.log(`Retrying in ${delay/1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  return false;
+};
+
+// Start the seeding process
+(async () => {
+  try {
+    const connected = await connectWithRetry();
+    if (!connected) {
+      console.error('Failed to connect to MongoDB after maximum retries');
+      process.exit(1);
+    }
+    
+    await seedDatabase();
+  } catch (error) {
+    console.error('Fatal error:', error);
+    process.exit(1);
+  }
+})();
+
+// --- Clean Database ---
+const cleanDatabase = async () => {
+  console.log('Cleaning database...');
+  const models = [
+    User, Role, Permission, Restaurant, Venue, Zone, TableType, Table,
+    Category, SubCategory, SubSubCategory, Menu, MenuItem, Modifier,
+    Order, Payment, Notification
+  ];
+  for (const model of models) {
+    try {
+      await model.deleteMany({});
+    } catch (err) {
+      console.warn(`Warning: Could not delete ${model.modelName}: ${err.message}`);
+    }
+  }
+  console.log('Database cleaned');
+};
+
+// --- Main Seeding Function ---
+const seedDatabase = async () => {
+  try {
+    await cleanDatabase();
+
+    const permissions = await seedPermissions();
+    const roles = await seedRoles(permissions);
+    const users = await seedUsers(roles); // Pass only roles, permissions are derived
+
+    const restaurants = await seedRestaurants(users); // Pass users to assign admins
+
+    // Seed restaurant-specific data
+    const allVenues = [];
+    const allZones = [];
+    const allTableTypes = [];
+    const allTables = [];
+    const allCategories = [];
+    const allSubCategories = [];
+    const allSubSubCategories = [];
+    const allModifiers = [];
+    const allMenuItems = [];
+    const allMenus = [];
+
+
+    for (const restaurant of restaurants) {
+        console.log(`\n--- Seeding data for Restaurant: ${restaurant.name} ---`);
+
+        const currentTableTypes = await seedTableTypes(restaurant);
+        allTableTypes.push(...currentTableTypes);
+
+        const currentVenues = await seedVenues(restaurant);
+        allVenues.push(...currentVenues);
+
+        const currentZones = await seedZones(currentVenues);
+        allZones.push(...currentZones);
+
+        const currentTables = await seedTables(restaurant, currentVenues, currentZones, currentTableTypes);
+        allTables.push(...currentTables);
+
+        const categoryResult = await seedCategoryHierarchy(restaurant);
+        allCategories.push(...categoryResult.categories);
+        allSubCategories.push(...categoryResult.subCategories);
+        allSubSubCategories.push(...categoryResult.subSubCategories);
+
+        const currentModifiers = await seedModifiers(restaurant);
+        allModifiers.push(...currentModifiers);
+
+        const currentMenuItems = await seedMenuItems(
+            restaurant,
+            currentVenues, // Items can be linked to venues
+            categoryResult.categories,
+            categoryResult.subCategories,
+            categoryResult.subSubCategories,
+            currentModifiers
+        );
+        allMenuItems.push(...currentMenuItems);
+
+         const currentMenus = await seedMenus(
+            restaurant,
+            currentVenues, // Menus are linked to venues
+            categoryResult.categories,
+            categoryResult.subCategories
+        );
+        allMenus.push(...currentMenus);
+
+        // Update restaurant refs (important!) - This should ideally happen within seeding funcs
+        await Restaurant.findByIdAndUpdate(restaurant._id, {
+            $addToSet: { // Use $addToSet to avoid duplicates if run multiple times conceptually
+                venues: { $each: currentVenues.map(v => v._id) },
+                tables: { $each: currentTables.map(t => t._id) },
+                // Menu items are not directly linked in Restaurant model based on schema provided
+            }
+        });
+    }
+
+    // Seed transactional data (Orders, Payments, Notifications) using created entities
+    const orders = await seedOrders(restaurants, users, allTables, allMenuItems, allModifiers);
+    const payments = await seedPayments(orders, users);
+    await seedNotifications(users, orders);
+
+    console.log('\nDatabase seeded successfully');
+
+  } catch (error) {
+    console.error('\nError seeding database:', error);
+  } finally {
+     console.log('Closing database connection...');
+     try {
+       await mongoose.connection.close();
+       console.log('Database connection closed.');
+     } catch (err) {
+       console.error('Error closing database connection:', err);
+     }
+  }
+};
+
+
+// --- Seed Functions ---
+
+const seedPermissions = async () => {
+  console.log('Seeding permissions...');
+  const permissionsList = [
+      // Basic CRUD naming convention often used
+      { name: 'manage_users', description: 'Full control over users, roles, permissions' },
+      { name: 'view_users', description: 'View user list and details' },
+      { name: 'manage_restaurants', description: 'Full control over restaurants, venues, zones, tables' },
+      { name: 'view_restaurants', description: 'View restaurant list and details' },
+      { name: 'manage_menus', description: 'Full control over menus, categories, items, modifiers' },
+      { name: 'view_menus', description: 'View menu details' },
+      { name: 'manage_orders', description: 'View and update status of all orders' },
+      { name: 'view_orders', description: 'View orders (e.g., for specific restaurant)' },
+      { name: 'place_order', description: 'Permission for customers to place orders' },
+      { name: 'view_own_orders', description: 'Permission for customers to view their own orders' },
+      { name: 'manage_payments', description: 'View payment details' },
+      { name: 'manage_notifications', description: 'Send notifications (maybe admin)' },
+      { name: 'view_analytics', description: 'Access analytics dashboards' },
+      { name: 'manage_loyalty', description: 'Manage loyalty settings and rewards'},
+      { name: 'manage_promotions', description: 'Manage promotions and combos'}
+  ];
+  const createdPermissions = await Permission.insertMany(permissionsList);
+  console.log(`Created ${createdPermissions.length} permissions`);
+  return createdPermissions;
+};
+
+const seedRoles = async (permissions) => {
+  console.log('Seeding roles...');
+  const permissionMap = permissions.reduce((map, p) => { map[p.name] = p._id; return map; }, {});
+
+  const getPerms = (names) => names.map(name => permissionMap[name]).filter(id => id);
+
+  const rolesList = [
+    {
+      name: 'SuperAdmin',
+      description: 'Full system access',
+      permissions: getPerms(['manage_users', 'manage_restaurants', 'manage_menus', 'manage_orders', 'manage_payments', 'manage_notifications', 'view_analytics', 'manage_loyalty', 'manage_promotions'])
+    },
+    {
+      name: 'RestaurantAdmin',
+      description: 'Manages a specific restaurant',
+      permissions: getPerms(['view_users', 'manage_menus', 'manage_orders', 'view_orders', 'manage_payments', 'view_analytics', 'manage_loyalty', 'manage_promotions']) // Needs manage_restaurants scoped later
+    },
+    {
+      name: 'VenueManager',
+       description: 'Manages a specific venue within a restaurant',
+       permissions: getPerms(['view_menus', 'manage_orders', 'view_orders']) // Scope needed
+    },
+    {
+      name: 'Staff',
+      description: 'Basic operational staff',
+      permissions: getPerms(['view_menus', 'view_orders', 'place_order']) // Might need update order status permission subset
+    },
+    {
+      name: 'Customer',
+      description: 'Standard customer',
+      permissions: getPerms(['view_menus', 'place_order', 'view_own_orders'])
+    }
+  ];
+  const createdRoles = await Role.insertMany(rolesList);
+  console.log(`Created ${createdRoles.length} roles`);
+  return createdRoles;
+};
+
+const seedUsers = async (roles) => {
+  console.log('Seeding users...');
+  const roleMap = roles.reduce((map, r) => { map[r.name] = r._id; return map; }, {});
+  const hashedPassword = await bcrypt.hash('Password123!', SALT_ROUNDS);
+
+  const usersList = [
+    { email: 'superadmin@inseat.com', password: hashedPassword, roles: [roleMap.SuperAdmin], loyaltyPoints: 0, isEsaadEligible: false, isFazaaEligible: false },
+    { email: 'restadmin1@inseat.com', password: hashedPassword, roles: [roleMap.RestaurantAdmin], loyaltyPoints: 0, isEsaadEligible: false, isFazaaEligible: false },
+    { email: 'venuemanager1@inseat.com', password: hashedPassword, roles: [roleMap.VenueManager], loyaltyPoints: 0, isEsaadEligible: false, isFazaaEligible: false },
+    { email: 'staff1@inseat.com', password: hashedPassword, roles: [roleMap.Staff], loyaltyPoints: 0, isEsaadEligible: false, isFazaaEligible: false },
+    { email: 'customer1@example.com', password: hashedPassword, roles: [roleMap.Customer], loyaltyPoints: faker.number.int({ min: 50, max: 1500 }), isEsaadEligible: false, isFazaaEligible: false },
+    { email: 'customer_esaad@example.com', password: hashedPassword, roles: [roleMap.Customer], loyaltyPoints: faker.number.int({ min: 50, max: 1500 }), isEsaadEligible: true, isFazaaEligible: false }, // ESAAD Example
+    { email: 'customer_fazaa@example.com', password: hashedPassword, roles: [roleMap.Customer], loyaltyPoints: faker.number.int({ min: 50, max: 1500 }), isEsaadEligible: false, isFazaaEligible: true }, // FAZAA Example
+  ];
+
+  // Add more random customers
+  for (let i = 0; i < 10; i++) {
+      const isEsaad = Math.random() > 0.8; // 20% chance
+      const isFazaa = !isEsaad && Math.random() > 0.8; // 20% chance if not Esaad
+      usersList.push({
+          email: faker.internet.email(),
+          password: hashedPassword,
+          roles: [roleMap.Customer],
+          loyaltyPoints: faker.number.int({ min: 0, max: 2000 }),
+          isEsaadEligible: isEsaad,
+          isFazaaEligible: isFazaa
+      });
+  }
+
+  const createdUsers = await User.insertMany(usersList);
+  console.log(`Created ${createdUsers.length} users`);
+  return createdUsers;
+};
+
+const seedRestaurants = async (users) => {
+    console.log('Seeding restaurants...');
+    const adminUser = users.find(u => u.email === 'superadmin@inseat.com');
+    const restAdmins = users.filter(u => u.roles.some(roleId =>
+        mongoose.Types.ObjectId.isValid(roleId) && // Check if it's a valid ObjectId before comparison
+        roles.find(r => r._id.equals(roleId))?.name === 'RestaurantAdmin'
+    ));
+
+    // Find roles again if needed or pass them from seedUsers
+    const roles = await Role.find({}); // Fetch roles to use in the filter
+
+    const restaurantsList = [
+        {
+            name: "CINEMA CITY ARABIAN CENTRE",
+            locations: [{ address: "Arabian Centre, Dubai", coordinates: { latitude: 25.2188, longitude: 55.4083 } }],
+            adminIds: [adminUser?._id, restAdmins[0]?._id].filter(id => id), // Assign SuperAdmin and first RestaurantAdmin
+            schedule: [/* Your Schedule Data Here or generate dynamically */],
+            // venues, tables will be added later
+        },
+        {
+            name: "CINEMA CITY AL QANA",
+            locations: [{ address: "Al Qana, Abu Dhabi", coordinates: { latitude: 24.4316, longitude: 54.4111 } }],
+             adminIds: [adminUser?._id, restAdmins[1]?._id].filter(id => id),
+             schedule: [/*...*/],
+        },
+        {
+            name: "CINEMA CITY AL QANA VIP",
+            locations: [{ address: "Al Qana, Abu Dhabi", coordinates: { latitude: 24.4316, longitude: 54.4111 } }],
+             adminIds: [adminUser?._id, restAdmins[2]?._id].filter(id => id),
+             schedule: [/*...*/],
+        }
+    ];
+    const createdRestaurants = await Restaurant.insertMany(restaurantsList);
+    console.log(`Created ${createdRestaurants.length} restaurants`);
+    return createdRestaurants;
+};
+
+const seedVenues = async (restaurant) => {
+    // console.log(`Seeding venues for ${restaurant.name}...`);
+    let venueData = [];
+    if (restaurant.name.includes("ARABIAN CENTRE")) {
+        venueData = ["Screen 1", "Screen 2", "Screen 3", "Barista Counter", "Lounge Seating"];
+    } else if (restaurant.name.includes("AL QANA VIP")) {
+        venueData = ["VIP Lounge 1", "VIP Lounge 2", "Private Dining Room"];
+    } else if (restaurant.name.includes("AL QANA")) {
+        venueData = ["Screen 1", "Screen 2", "IMAX Screen", "Food Court Counter"];
+    }
+
+    const venuesToCreate = venueData.map(name => ({
+        name: name,
+        description: `${name} at ${restaurant.name}`,
+        capacity: faker.number.int({ min: 20, max: 150 }),
+        isActive: true,
+        restaurantId: restaurant._id
+    }));
+
+    const createdVenues = await Venue.insertMany(venuesToCreate);
+    // console.log(` -> Created ${createdVenues.length} venues`);
+    return createdVenues;
+};
+
+const seedZones = async (venues) => {
+    // console.log(`Seeding zones...`);
+    const zones = [];
+    const zoneNames = ["Front Row", "Middle Section", "Back Balcony", "Side Area", "Premium Zone"];
+
+    for (const venue of venues) {
+        if (venue.name.includes('Counter')) continue; // Skip zones for counters
+
+        const numZones = faker.number.int({ min: 1, max: 3 });
+        for (let i = 0; i < numZones; i++) {
+            const zone = new Zone({
+                name: `${getRandomElement(zoneNames)} ${i+1}`,
+                description: `Zone in ${venue.name}`,
+                venueId: venue._id,
+                capacity: Math.floor(venue.capacity / numZones), // Distribute capacity
+                isActive: true,
+                tables: [] // Populated later
+            });
+            zones.push(zone);
+        }
+    }
+    const createdZones = await Zone.insertMany(zones);
+    // console.log(` -> Created ${createdZones.length} zones`);
+    return createdZones;
+};
+
+const seedTableTypes = async (restaurant) => {
+    // console.log(`Seeding table types for ${restaurant.name}...`);
+    let tableTypeData = [];
+     if (restaurant.name.includes("ARABIAN CENTRE")) {
+        tableTypeData = [
+            { name: "Standard Seating", description: "Regular cinema seat" },
+            { name: "Premium Recliner", description: "Luxury recliner" },
+            { name: "Couple Seat", description: "Seats for two" },
+        ];
+    } else if (restaurant.name.includes("AL QANA VIP")) {
+         tableTypeData = [
+            { name: "VIP Recliner", description: "Fully reclining leather seats" },
+            { name: "VIP Couple Suite", description: "Private seating for two" },
+            { name: "VIP Dining Table", description: "In-lounge dining" },
+        ];
+    } else if (restaurant.name.includes("AL QANA")) {
+        tableTypeData = [
+            { name: "Standard Seating", description: "Regular cinema seat" },
+            { name: "IMAX Seating", description: "Optimized for IMAX view" },
+            { name: "Family Booth", description: "Group seating" },
+        ];
+    }
+
+    const typesToCreate = tableTypeData.map(type => ({
+        ...type,
+        restaurantId: restaurant._id
+    }));
+
+    const createdTableTypes = await TableType.insertMany(typesToCreate);
+    // console.log(` -> Created ${createdTableTypes.length} table types`);
+    return createdTableTypes;
+};
+
+const seedTables = async (restaurant, venues, zones, tableTypes) => {
+    // console.log(`Seeding tables for ${restaurant.name}...`);
+    const tables = [];
+    const zonesForRestaurant = zones.filter(z => venues.some(v => v._id.equals(z.venueId)));
+    const tableTypesForRestaurant = tableTypes; // Already filtered in the loop structure
+
+    for (const venue of venues) {
+        if (venue.name.includes('Counter')) continue; // Skip tables for counters
+
+        const zonesForVenue = zonesForRestaurant.filter(z => z.venueId.equals(venue._id));
+        const numTables = Math.min(NUM_TABLES_PER_VENUE_APPROX, Math.floor(venue.capacity / 2)); // Approx tables
+
+        for (let i = 0; i < numTables; i++) {
+            const tableType = getRandomElement(tableTypesForRestaurant);
+            const zone = zonesForVenue.length > 0 ? zonesForVenue[i % zonesForVenue.length] : null; // Distribute among zones
+
+            const capacity = tableType?.name.includes('Couple') || tableType?.name.includes('Recliner') ? 2 :
+                             tableType?.name.includes('Family') ? 6 :
+                             tableType?.name.includes('Dining') ? 4 : 2; // Default capacity
+
+            const tablePrefix = restaurant.name.substring(13, 16); // e.g., ARA, ALQ, VIP
+            const tableNumStr = `${tablePrefix}${venue.name.replace(/[^0-9]/g, '').padStart(1,'1')}${String(i+1).padStart(3,'0')}`; // e.g. ARA1001
+
+            const table = new Table({
+                name: `Table ${tableNumStr}`,
+                number: tableNumStr, // Use the generated string
+                capacity: capacity,
+                restaurantId: restaurant._id,
+                venueId: venue._id,
+                zoneId: zone?._id || null,
+                tableTypeId: tableType?._id || null,
+                isActive: true,
+                isAvailable: Math.random() > 0.1, // 90% available
+                order: i + 1
+            });
+            tables.push(table);
+
+            // Add table ID to zone if applicable (do bulk update later for efficiency)
+            if (zone) {
+                 zone.tables.push(table._id);
+            }
+        }
+    }
+
+    const createdTables = await Table.insertMany(tables);
+
+    // Bulk update zones with table IDs
+    const zoneUpdateOps = zonesForRestaurant.map(zone => ({
+        updateOne: {
+            filter: { _id: zone._id },
+            update: { $set: { tables: zone.tables } } // zone.tables was populated in the loop
+        }
+    }));
+    if(zoneUpdateOps.length > 0) {
+        await Zone.bulkWrite(zoneUpdateOps);
+    }
+
+
+    // console.log(` -> Created ${createdTables.length} tables`);
+    return createdTables;
+};
+
+// Refactored category seeding
+const seedCategoryHierarchy = async (restaurant) => {
+    // console.log(`Seeding category hierarchy for ${restaurant.name}...`);
+    const createdCategories = [];
+    const createdSubCategories = [];
+    const createdSubSubCategories = [];
+
+    // Simplified Example Structure (Adapt with your cinemaMenuStructure)
+    const menuStructure = [
+        { name: "Popcorn", sub: [ { name: "Savory", subsub: ["Salted", "Butter"] }, { name: "Sweet", subsub: ["Caramel"] } ] },
+        { name: "Drinks", sub: [ { name: "Sodas", subsub: ["Cola", "Lemon-Lime"] }, { name: "Juices", subsub: ["Orange"] } ] },
+        { name: "Snacks", sub: [ { name: "Hot", subsub: ["Fries", "Nachos"] }, { name: "Candy", subsub: ["Chocolate", "Gummies"] } ] },
+    ];
+
+    for (const catData of menuStructure) {
+        const category = new Category({
+            name: catData.name,
+            description: `All ${catData.name}`,
+            image: getPlaceholderImage(catData.name.toLowerCase()),
+            restaurantId: restaurant._id,
+            isActive: true,
+            order: menuStructure.indexOf(catData),
+        });
+        await category.save();
+        createdCategories.push(category);
+
+        for (const subCatData of catData.sub) {
+            const subCategory = new SubCategory({
+                name: subCatData.name,
+                description: `${subCatData.name} ${catData.name}`,
+                image: getPlaceholderImage(subCatData.name.toLowerCase()),
+                restaurantId: restaurant._id,
+                categoryId: category._id,
+                isActive: true,
+                order: catData.sub.indexOf(subCatData),
+            });
+            await subCategory.save();
+            createdSubCategories.push(subCategory);
+
+            for (const subSubName of subCatData.subsub) {
+                const subSubCategory = new SubSubCategory({
+                    name: subSubName,
+                    description: `${subSubName} ${subCatData.name} ${catData.name}`,
+                    image: getPlaceholderImage(subSubName.toLowerCase()),
+                    restaurantId: restaurant._id,
+                    categoryId: category._id,
+                    subCategoryId: subCategory._id,
+                    isActive: true,
+                    order: subCatData.subsub.indexOf(subSubName),
+                });
+                await subSubCategory.save();
+                createdSubSubCategories.push(subSubCategory);
+            }
+        }
+    }
+    // console.log(` -> Created ${createdCategories.length} Cat, ${createdSubCategories.length} Sub, ${createdSubSubCategories.length} SubSub`);
+    return { categories: createdCategories, subCategories: createdSubCategories, subSubCategories: createdSubSubCategories };
+};
+
+const seedModifiers = async (restaurant) => {
+    // console.log(`Seeding modifiers for ${restaurant.name}...`);
+    const commonModifiersData = [
+        { name: "Size", description: "Select Size", isRequired: true, multiSelect: false, options: [ { name: "Regular", price: 0 }, { name: "Large", price: 5.00 }] },
+        { name: "Add Dip", description: "Extra dipping sauce", isRequired: false, multiSelect: true, maxSelect: 2, options: [ { name: "Ketchup", price: 1.50 }, { name: "Cheese Sauce", price: 3.00 }, { name: "BBQ", price: 2.00 }] },
+        { name: "Extra Topping", description: "Add-ons", isRequired: false, multiSelect: true, options: [ { name: "Extra Butter", price: 2.00 }, { name: "Jalapeños", price: 2.50 }] },
+    ];
+
+    const modifiersToCreate = commonModifiersData.map(mod => ({
+        ...mod,
+        restaurantId: restaurant._id,
+        isActive: true,
+        order: commonModifiersData.indexOf(mod)
+    }));
+
+    const createdModifiers = await Modifier.insertMany(modifiersToCreate);
+    // console.log(` -> Created ${createdModifiers.length} modifiers`);
+    return createdModifiers;
+};
+
+const seedMenuItems = async (restaurant, venues, categories, subCategories, subSubCategories, modifiers) => {
+    // console.log(`Seeding menu items for ${restaurant.name}...`);
+    const menuItems = [];
+    const subSubCatsForRestaurant = subSubCategories.filter(ssc => ssc.restaurantId.equals(restaurant._id));
+
+    for (const subSubCategory of subSubCatsForRestaurant) {
+        for (let i = 0; i < NUM_MENU_ITEMS_PER_SUB_SUB_CATEGORY; i++) {
+            const randomVenue = getRandomElement(venues); // Assign item primarily to one venue maybe? Or all?
+            const menuItem = new MenuItem({
+                name: `${subSubCategory.name} Item ${i + 1}`,
+                description: faker.lorem.sentence(),
+                venueId: randomVenue._id, // Link to a specific venue
+                categories: [subSubCategory.categoryId],
+                subCategories: [subSubCategory.subCategoryId],
+                subSubCategory: subSubCategory._id,
+                price: parseFloat(faker.commerce.price({ min: 5, max: 40 })),
+                modifierGroups: getRandomSubset(modifiers.map(m => m._id), 2), // Assign 0, 1 or 2 modifiers
+                image: getPlaceholderImage(subSubCategory.name.toLowerCase()),
+                preparationTime: faker.number.int({ min: 1, max: 15 }),
+                isAvailable: Math.random() > 0.05, // 95% available
+                isActive: true,
+                allergens: getRandomSubset(["Gluten", "Dairy", "Nuts"], 2),
+                nutritionalInfo: { calories: faker.number.int({ min: 100, max: 800 }) },
+                restaurantId: restaurant._id,
+            });
+            menuItems.push(menuItem);
+        }
+    }
+    const createdMenuItems = await MenuItem.insertMany(menuItems);
+    // console.log(` -> Created ${createdMenuItems.length} menu items`);
+    return createdMenuItems;
+};
+
+const seedMenus = async (restaurant, venues, categories, subCategories) => {
+    // console.log(`Seeding menus for ${restaurant.name}...`);
+    const menus = [];
+    const categoriesForRestaurant = categories.filter(c => c.restaurantId.equals(restaurant._id)).map(c => c._id);
+    const subCategoriesForRestaurant = subCategories.filter(sc => sc.restaurantId.equals(restaurant._id)).map(sc => sc._id);
+
+    for (const venue of venues) {
+         // Create 1 or 2 menus per venue
+        const numMenus = venue.name.includes('Counter') || venue.name.includes('Lounge') ? 1 : faker.number.int({ min: 1, max: 2 });
+
+        for (let i = 0; i < numMenus; i++) {
+            const menuName = i === 0 ? `Main Menu - ${venue.name}` : `Snacks Menu - ${venue.name}`;
+             const menu = new Menu({
+                name: menuName,
+                description: `Available selections at ${venue.name}`,
+                restaurantId: restaurant._id,
+                venueId: venue._id,
+                categories: categoriesForRestaurant, // Link all relevant cats
+                subCategories: subCategoriesForRestaurant, // Link all relevant subcats
+            });
+            menus.push(menu);
+        }
+    }
+    const createdMenus = await Menu.insertMany(menus);
+    // console.log(` -> Created ${createdMenus.length} menus`);
+    return createdMenus;
+};
+
+
+const seedOrders = async (restaurants, users, tables, menuItems, modifiers) => {
+  console.log('Seeding orders...');
+  const orders = [];
+  const customerUsers = users.filter(u => u.roles.some(roleId => {
+      // Find the role object corresponding to roleId before accessing its name
+      const role = roles.find(r => r._id.equals(roleId));
+      return role && role.name === 'Customer';
+  }));
+  const orderStatuses = ['Pending', 'Confirmed', 'Preparing', 'Ready', 'Served', 'Completed', 'Cancelled'];
+
+   // Fetch roles if not already available globally
+   const roles = await Role.find({});
+
+
+  for (let i = 0; i < 50; i++) { // Create 50 sample orders
+    const randomRestaurant = getRandomElement(restaurants);
+    const randomUser = getRandomElement(customerUsers);
+    const tablesForRestaurant = tables.filter(t => t.restaurantId.equals(randomRestaurant._id));
+    const randomTable = getRandomElement(tablesForRestaurant);
+    const menuItemsForRestaurant = menuItems.filter(mi => mi.restaurantId.equals(randomRestaurant._id));
+    const modifiersForRestaurant = modifiers.filter(m => m.restaurantId.equals(randomRestaurant._id));
+
+    if (!randomUser || !randomTable || menuItemsForRestaurant.length === 0) continue; // Skip if essential data missing
+
+    const orderItems = [];
+    let totalAmount = 0;
+    const numOrderItems = faker.number.int({ min: 1, max: 5 });
+
+    for (let j = 0; j < numOrderItems; j++) {
+      const randomMenuItem = getRandomElement(menuItemsForRestaurant);
+      if (!randomMenuItem) continue;
+
+      const quantity = faker.number.int({ min: 1, max: 3 });
+      let itemPrice = randomMenuItem.price;
+      const selectedModifiers = [];
+
+      // Select random modifiers if the item has them
+       if (randomMenuItem.modifierGroups && randomMenuItem.modifierGroups.length > 0) {
+         const potentialModifiers = modifiersForRestaurant.filter(m => randomMenuItem.modifierGroups.includes(m._id));
+         const numModifiersToSelect = getRandomSubset(potentialModifiers, potentialModifiers.length).length; // Select a subset
+
+         for(let k=0; k < numModifiersToSelect; k++) {
+             const modifier = potentialModifiers[k];
+             if (!modifier || !modifier.options || modifier.options.length === 0) continue;
+
+             const selectedOption = getRandomElement(modifier.options);
+             if(selectedOption) {
+                 selectedModifiers.push({
+                     modifierId: modifier._id,
+                     // options: [selectedOption.name], // Schema shows array, but likely one selection if multiSelect=false
+                     optionName: selectedOption.name, // Storing name might be useful
+                     price: selectedOption.price || 0,
+                 });
+                 itemPrice += (selectedOption.price || 0);
+             }
+         }
+       }
+
+      orderItems.push({
+        menuItemId: randomMenuItem._id,
+        quantity: quantity,
+        price: itemPrice, // Price per item *including* selected modifiers
+        modifiers: selectedModifiers,
+      });
+      totalAmount += itemPrice * quantity;
+    }
+
+    if(orderItems.length === 0) continue; // Don't create empty orders
+
+    const order = new Order({
+      restaurantId: randomRestaurant._id,
+      userId: randomUser._id,
+      items: orderItems,
+      status: getRandomElement(orderStatuses),
+      tableId: randomTable._id,
+      totalAmount: parseFloat(totalAmount.toFixed(2)),
+      paymentStatus: Math.random() > 0.2 ? 'Paid' : 'Unpaid', // 80% paid
+      orderType: 'Dine-in', // Assuming dine-in for table-based orders
+      specialInstructions: Math.random() > 0.8 ? faker.lorem.sentence() : '',
+      createdAt: faker.date.past({ years: 1 }), // Orders within the last year
+    });
+    orders.push(order);
+  }
+
+  const createdOrders = await Order.insertMany(orders);
+  console.log(`Created ${createdOrders.length} orders`);
+  return createdOrders;
+};
+
+const seedPayments = async (orders, users) => {
+  console.log('Seeding payments...');
+  const payments = [];
+  const paymentMethods = ['Credit Card', 'Cash', 'Apple Pay', 'Google Pay'];
+  const paymentStatuses = ['Succeeded', 'Pending', 'Failed'];
+
+  const paidOrders = orders.filter(o => o.paymentStatus === 'Paid');
+
+  for (const order of paidOrders) {
+     if (!order.userId) continue; // Skip if no user associated (shouldn't happen with current logic)
+
+    const payment = new Payment({
+      orderId: order._id,
+      userId: order.userId,
+      amount: order.totalAmount,
+      status: 'Succeeded', // Seeding successful payments for paid orders
+      paymentMethod: getRandomElement(paymentMethods),
+      transactionId: faker.string.alphanumeric(16).toUpperCase(),
+      createdAt: order.createdAt, // Match order time or slightly after
+    });
+    payments.push(payment);
+  }
+
+  const createdPayments = await Payment.insertMany(payments);
+  console.log(`Created ${createdPayments.length} payments`);
+  return createdPayments;
+};
+
+const seedPayments = async (orders, users) => {
+  console.log('Seeding payments...');
+  const payments = [];
+  const paymentMethods = ['Credit Card', 'Cash', 'Apple Pay', 'Google Pay'];
+  const paymentStatuses = ['Succeeded', 'Pending', 'Failed'];
+
+  const paidOrders = orders.filter(o => o.paymentStatus === 'Paid');
+
+  for (const order of paidOrders) {
+     if (!order.userId) continue; // Skip if no user associated (shouldn't happen with current logic)
+
+    const payment = new Payment({
+      orderId: order._id,
+      userId: order.userId,
+      amount: order.totalAmount,
+      status: 'Succeeded', // Seeding successful payments for paid orders
+      paymentMethod: getRandomElement(paymentMethods),
+      transactionId: faker.string.alphanumeric(16).toUpperCase(),
+      createdAt: order.createdAt, // Match order time or slightly after
+    });
+    payments.push(payment);
+  }
+
+  const createdPayments = await Payment.insertMany(payments);
+  console.log(`Created ${createdPayments.length} payments`);
+  return createdPayments;
+};
+
+const seedNotifications = async (users, orders) => {
+  console.log('Seeding notifications...');
+  const notifications = [];
+  const notificationTypes = ['OrderUpdate', 'Promotion', 'AccountInfo'];
+
+  // Create 30 sample notifications
+  for (let i = 0; i < 30; i++) {
+    const randomUser = getRandomElement(users);
+    const randomOrder = getRandomElement(orders);
+    const type = getRandomElement(notificationTypes);
+
+    let title = '';
+    let message = '';
+    let data = {};
+
+    switch(type) {
+      case 'OrderUpdate':
+        if (!randomOrder) continue;
+        title = `Order #${randomOrder._id.toString().slice(-6)} Update`;
+        message = `Your order status is now ${randomOrder.status}.`;
+        data = { orderId: randomOrder._id, newStatus: randomOrder.status };
+        break;
+      case 'Promotion':
+        title = 'Special Offer Just For You!';
+        message = `Get 20% off your next popcorn purchase with code POP20!`;
+        data = { promoCode: 'POP20', discount: 20 };
+        break;
+      case 'AccountInfo':
+        title = 'Welcome to INSEAT!';
+        message = `Thanks for joining, ${randomUser.email}! Explore our menu now.`;
+        data = { welcome: true };
+        break;
+      default:
+        continue;
+    }
+
+    const notification = new Notification({
+      userId: randomUser._id,
+      type: type,
+      title: title,
+      message: message,
+      data: data,
+      isRead: Math.random() > 0.5,
+      createdAt: faker.date.recent({ days: 30 })
+    });
+    notifications.push(notification);
+  }
+
+  const createdNotifications = await Notification.insertMany(notifications);
+  console.log(`Created ${createdNotifications.length} notifications`);
+  return createdNotifications;
+};
+       allZones.push(...currentZones);
+
+        const currentTables = await seedTables(restaurant, currentVenues, currentZones, currentTableTypes);
+        allTables.push(...currentTables);
+
+        const categoryResult = await seedCategoryHierarchy(restaurant);
+        allCategories.push(...categoryResult.categories);
+        allSubCategories.push(...categoryResult.subCategories);
+        allSubSubCategories.push(...categoryResult.subSubCategories);
+
+        const currentModifiers = await seedModifiers(restaurant);
+        allModifiers.push(...currentModifiers);
+
+        const currentMenuItems = await seedMenuItems(
+            restaurant,
+            currentVenues,
+            categoryResult.categories,
+            categoryResult.subCategories,
+            categoryResult.subSubCategories,
+            currentModifiers
+        );
+        allMenuItems.push(...currentMenuItems);
+
+        const currentMenus = await seedMenus(
+            restaurant,
+            currentVenues,
+            categoryResult.categories,
+            categoryResult.subCategories
+        );
+        allMenus.push(...currentMenus);
+
+        // Update restaurant refs
+        await Restaurant.findByIdAndUpdate(restaurant._id, {
+            $addToSet: {
+                venues: { $each: currentVenues.map(v => v._id) },
+                tables: { $each: currentTables.map(t => t._id) }
+            }
+        });
+    }
+
+    // Seed transactional data
+    const orders = await seedOrders(restaurants, users, allTables, allMenuItems, allModifiers, roles);
+    const payments = await seedPayments(orders, users);
+    await seedNotifications(users, orders);
+
+    console.log('\nDatabase seeded successfully');
+  } catch (error) {
+    console.error('\nError seeding database:', error);
+  } finally {
+    console.log('Closing database connection...');
+    try {
+      await mongoose.connection.close();
+      console.log('Database connection closed.');
+    } catch (err) {
+      console.error('Error closing database connection:', err);
+    }
+  }
+};
+
+
+// --- Start the Seeding Process ---
+// The connection logic at the top calls seedDatabase()

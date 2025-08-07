@@ -1,0 +1,67 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ staging ]
+
+jobs:
+  deploy:
+    name: Deploy to Staging Server
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add server to known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to staging server
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} << 'SSHEOF'
+          cd /home/administrator/Desktop/Project/staging-example
+          git fetch origin
+          git reset --hard origin/staging
+          chmod +x deploy.sh
+          
+          # Stop existing staging containers
+          docker compose down || true
+          
+          # Use default docker-compose.yml (staging config with port 3002)
+          docker compose build --no-cache
+          docker compose up -d
+          
+          # Wait for container to be healthy
+          sleep 15
+          
+          # Check health
+          max_attempts=12
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            if curl -f http://localhost:3002/health > /dev/null 2>&1; then
+              echo "✅ Staging application is healthy"
+              break
+            fi
+            echo "Health check attempt $attempt/$max_attempts - waiting..."
+            sleep 5
+            ((attempt++))
+          done
+          
+          if [ $attempt -gt $max_attempts ]; then
+            echo "❌ Staging health check failed"
+            docker compose logs --tail 20
+            exit 1
+          fi
+        SSHEOF
+
+    - name: Verify staging deployment
+      run: |
+        sleep 30
+        curl -f https://sandboxapi.inseat.achievengine.com/health || exit 1
+        echo "✅ Staging Backend deployment successful!"

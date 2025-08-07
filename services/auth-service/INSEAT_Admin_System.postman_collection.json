@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "INSEAT Admin System",
+    "description": "API collection for INSEAT Admin System with magic link functionality",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "System Admin",
+      "item": [
+        {
+          "name": "Create First Sys-Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/sys-admin/setup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "sys-admin", "setup"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sysadmin@example.com\",\n  \"firstName\": \"System\",\n  \"lastName\": \"Administrator\"\n}"
+            },
+            "description": "Creates the first system administrator if none exists"
+          }
+        },
+        {
+          "name": "Create Admin User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sysAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/sys-admin/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "sys-admin", "admins"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\"\n}"
+            },
+            "description": "Creates a new admin user (requires sys-admin authentication)"
+          }
+        },
+        {
+          "name": "List Admin Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sysAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/sys-admin/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "sys-admin", "admins"]
+            },
+            "description": "Lists all admin users (requires sys-admin authentication)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Password Setup",
+      "item": [
+        {
+          "name": "Verify Setup Token",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-setup-token?token={{setupToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "verify-setup-token"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{setupToken}}"
+                }
+              ]
+            },
+            "description": "Verifies the validity of a password setup token"
+          }
+        },
+        {
+          "name": "Setup Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/setup-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "setup-password"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{setupToken}}\",\n  \"password\": \"SecureP@ssw0rd\"\n}"
+            },
+            "description": "Sets up a new password using a valid setup token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sysadmin@example.com\",\n  \"password\": \"SecureP@ssw0rd\"\n}"
+            },
+            "description": "Authenticates a user and returns access token"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "sysAdminToken",
+      "value": "your-sys-admin-token"
+    },
+    {
+      "key": "setupToken",
+      "value": "your-setup-token"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": []
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-save tokens from responses",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.token) {",
+          "        pm.environment.set('sysAdminToken', jsonData.token);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}
+

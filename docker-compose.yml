@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env.staging
+    environment:
+      # Override or ensure critical variables
+      - NODE_ENV=staging
+      - PORT=3002
+      - REDIS_URL=redis://redis:6379
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      # Optional: Mount logs directory for easier debugging
+      - ./logs:/app/logs:rw
+    networks:
+      - backend-network
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - backend-network
+    volumes:
+      - redis_data:/data
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  redis_data:

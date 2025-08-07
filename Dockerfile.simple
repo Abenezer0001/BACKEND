@@ -1,0 +1,27 @@
+FROM node:18-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Install app dependencies
+# Copy package.json and package-lock.json first for better layer caching
+COPY package*.json ./
+RUN npm install
+
+# Copy app source
+COPY . .
+
+# Add tini for proper signal handling
+RUN apk add --no-cache tini
+
+# Expose port
+EXPOSE 3001
+
+# Set environment variables
+ENV NODE_ENV=production
+
+# Use tini as entrypoint to handle signals properly
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Run the same command as we do locally
+CMD ["npm", "start"]

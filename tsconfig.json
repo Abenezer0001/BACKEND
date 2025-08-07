@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "strictFunctionTypes": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./services/restaurant-service/src/types", "./services/auth-service/src/types", "./src/types"]
+  },
+  "include": ["src/**/*", "services/**/*", "utils/**/*", "services/restaurant-service/src/types/*.d.ts"],
+  "exclude": ["node_modules", "dist", "services/inventory-service"]
+}

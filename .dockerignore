@@ -1,0 +1,62 @@
+# Node modules and package manager files
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Version control
+.git
+.gitignore
+.git_disabled
+.github
+
+# Environment files (except example)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build artifacts
+dist
+build
+*.tsbuildinfo
+
+# Log files
+logs
+*.log
+
+# IDE/Editor specific files
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# Test coverage and reports
+coverage
+.nyc_output
+test-results
+
+# Project specific files that aren't needed at runtime
+.cursor
+.cursorrules
+.windsurfrules
+.repomix-output.txt
+backup
+
+# Documentation files
+*.md
+!README.md
+
+# Temporary files
+.tmp
+.temp
+
+# Specific documentation files
+README-task-master.md
+INSEAT_BACKEND_DOCUMENTATION.md
+PROJECT_STRUCTURE.md
+NOTION_INTEGRATION.md
+auth-api-documentation.md
+authentication-system.md
+

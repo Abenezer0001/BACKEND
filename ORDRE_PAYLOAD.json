@@ -1,0 +1,334 @@
+{
+    "id": "1249815882530476032",
+    "invoiceNo": null,
+    "storeId": "db301f87-f436-493d-bb88-356f745891c7",
+    "menuId": "65d357755a84a81a80f908dc",
+    "displayId": "OPL-DAQY4K",
+    "brand": {
+        "name": "Zero6 - Cinemacity",
+        "id": "65cafeb2c81369657b8d3a1c",
+        "$type": "Brand"
+    },
+    "kitchen": {
+        "name": "Zero6 - Cinemacity",
+        "id": "65cafefb6cfc8b1b97c47af5",
+        "$type": "Kitchen"
+    },
+    "type": "PICK_UP",
+    "instructions": null,
+    "delivery": {
+        "receiverName": "INSEAT",
+        "receiverMobileNumber": "+971505516276",
+        "location": {
+            "address": "Table No:S-2, M-18",
+            "latitude": "54.947304",
+            "longitude": "25.0757595",
+            "$type": "Location"
+        },
+        "notes": null,
+        "$type": "Delivery"
+    },
+    "customer": {
+        "name": "Opaala",
+        "contactNumber": "+971505516276",
+        "email": "contact@opaala.com",
+        "$type": "Customer"
+    },
+    "items": [
+        {
+            "id": "5666",
+            "name": "Flat White",
+            "quantity": 1,
+            "price": {
+                "unitPrice": {
+                    "amount": 2200,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED22.00",
+                    "$type": "UnitPrice"
+                },
+                "discountAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "DiscountAmount"
+                },
+                "taxAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "TaxAmount"
+                },
+                "totalPrice": {
+                    "amount": 2200,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED22.00",
+                    "$type": "TotalPrice"
+                },
+                "$type": "Price"
+            },
+            "modifiers": [],
+            "instructions": null,
+            "$type": "Item"
+        },
+        {
+            "id": "3342",
+            "name": "Nachos Deluxe",
+            "quantity": 1,
+            "price": {
+                "unitPrice": {
+                    "amount": 4500,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED45.00",
+                    "$type": "UnitPrice"
+                },
+                "discountAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "DiscountAmount"
+                },
+                "taxAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "TaxAmount"
+                },
+                "totalPrice": {
+                    "amount": 4500,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED45.00",
+                    "$type": "TotalPrice"
+                },
+                "$type": "Price"
+            },
+            "modifiers": [
+                {
+                    "id": "5510",
+                    "name": "Jalapeno",
+                    "quantity": 1,
+                    "price": {
+                        "unitPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "UnitPrice"
+                        },
+                        "discountAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "DiscountAmount"
+                        },
+                        "taxAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TaxAmount"
+                        },
+                        "totalPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TotalPrice"
+                        },
+                        "$type": "Price"
+                    },
+                    "$type": "Modifier"
+                },
+                {
+                    "id": "5509",
+                    "name": "Cheese",
+                    "quantity": 1,
+                    "price": {
+                        "unitPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "UnitPrice"
+                        },
+                        "discountAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "DiscountAmount"
+                        },
+                        "taxAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TaxAmount"
+                        },
+                        "totalPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TotalPrice"
+                        },
+                        "$type": "Price"
+                    },
+                    "$type": "Modifier"
+                },
+                {
+                    "id": "5508",
+                    "name": "Salsa",
+                    "quantity": 1,
+                    "price": {
+                        "unitPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "UnitPrice"
+                        },
+                        "discountAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "DiscountAmount"
+                        },
+                        "taxAmount": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TaxAmount"
+                        },
+                        "totalPrice": {
+                            "amount": 0,
+                            "currencyCode": "AED",
+                            "formattedAmount": "AED0.00",
+                            "$type": "TotalPrice"
+                        },
+                        "$type": "Price"
+                    },
+                    "$type": "Modifier"
+                }
+            ],
+            "instructions": null,
+            "$type": "Item"
+        },
+        {
+            "id": "3552",
+            "name": "Salted Popcorn Medium",
+            "quantity": 1,
+            "price": {
+                "unitPrice": {
+                    "amount": 2300,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED23.00",
+                    "$type": "UnitPrice"
+                },
+                "discountAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "DiscountAmount"
+                },
+                "taxAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "TaxAmount"
+                },
+                "totalPrice": {
+                    "amount": 2300,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED23.00",
+                    "$type": "TotalPrice"
+                },
+                "$type": "Price"
+            },
+            "modifiers": [],
+            "instructions": null,
+            "$type": "Item"
+        },
+        {
+            "id": "4905",
+            "name": "Regular Pepsi",
+            "quantity": 1,
+            "price": {
+                "unitPrice": {
+                    "amount": 2100,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED21.00",
+                    "$type": "UnitPrice"
+                },
+                "discountAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "DiscountAmount"
+                },
+                "taxAmount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "TaxAmount"
+                },
+                "totalPrice": {
+                    "amount": 2100,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED21.00",
+                    "$type": "TotalPrice"
+                },
+                "$type": "Price"
+            },
+            "modifiers": [],
+            "instructions": null,
+            "$type": "Item"
+        }
+    ],
+    "payment": {
+        "status": "PREPAID",
+        "method": "PREPAID",
+        "charges": {
+            "subTotal": {
+                "amount": 11100,
+                "currencyCode": "AED",
+                "formattedAmount": "AED111.00",
+                "$type": "SubTotal"
+            },
+            "total": {
+                "amount": 11100,
+                "currencyCode": "AED",
+                "formattedAmount": "AED111.00",
+                "$type": "Total"
+            },
+            "deliveryFee": {
+                "amount": 0,
+                "currencyCode": "AED",
+                "formattedAmount": "AED0.00",
+                "$type": "DeliveryFee"
+            },
+            "$type": "Charges"
+        },
+        "discounts": [],
+        "tax": [
+            {
+                "amount": {
+                    "amount": 0,
+                    "currencyCode": "AED",
+                    "formattedAmount": "AED0.00",
+                    "$type": "Amount"
+                },
+                "name": "Vat",
+                "$type": "Tax"
+            }
+        ],
+        "$type": "Payment"
+    },
+    "source": {
+        "name": "INSEAT",
+        "uniqueOrderId": "502deebc-3a4d-42aa-9e23-73681728e46b:5f1e6257-9df8-478e-ad53-d727dd884428",
+        "placedAt": "2025-06-10T19:52:57.7640000Z",
+        "channel": "INSEAT",
+        "$type": "Source"
+    },
+    "scheduledOrder": null,
+    "status": "OrderAccepted",
+    "placedAt": "2025-06-10T20:02:06.8600000Z",
+    "additionalInfo": {
+        "shortCode": null,
+        "$type": "AdditionalInfo"
+    },
+    "externalReferenceId": null,
+    "$type": "WebhookPayload"
+}

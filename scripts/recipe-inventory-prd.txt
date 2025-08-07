@@ -1,0 +1,462 @@
+# Recipe & Inventory Management System - Product Requirements Document
+
+## Executive Summary
+Design and implement a comprehensive Recipe and Inventory Management system that integrates with the existing INSEAT platform to provide complete food cost control, inventory tracking, recipe standardization, and yield optimization for restaurant operations.
+
+## Core Objectives
+- **Cost Control**: Track ingredient costs and calculate accurate food costs per menu item
+- **Inventory Management**: Real-time inventory tracking with automated reorder points
+- **Recipe Standardization**: Standardized recipes with precise measurements and yields
+- **Waste Reduction**: Track and minimize food waste through better inventory management
+- **Profitability**: Optimize menu pricing based on accurate cost calculations
+
+---
+
+## 1. Data Models & Relationships Architecture
+
+### Core Entities
+
+#### **Recipe System**
+```
+Recipe
+├── id, name, description, category
+├── servingSize, yield, prepTime, cookTime
+├── instructions[], allergens[], dietaryTags[]
+├── isActive, version, lastModified
+├── recipeIngredients[] → RecipeIngredient
+├── nutritionalInfo → NutritionalInfo
+├── recipeYield → RecipeYield
+└── costCalculation → RecipeCost
+
+RecipeIngredient
+├── id, recipeId, inventoryItemId
+├── quantity, unit, preparationMethod
+├── isOptional, substitutes[]
+├── costPerUnit, totalCost
+└── notes
+
+RecipeYield
+├── id, recipeId
+├── expectedYield, actualYield, yieldPercentage
+├── portionSize, portionsPerBatch
+├── scalingFactor, minimumBatch, maximumBatch
+└── yieldHistory[]
+```
+
+#### **Inventory System**
+```
+InventoryItem
+├── id, name, description, category, subcategory
+├── sku, barcode, unit, conversionFactors{}
+├── currentStock, minimumStock, maximumStock, reorderPoint
+├── averageCost, lastCost, standardCost
+├── supplierId, shelfLife, storageRequirements
+├── isActive, isPerishable, allergens[]
+├── stockMovements[] → StockMovement
+├── supplierItems[] → SupplierItem
+└── purchaseHistory[] → PurchaseOrderItem
+
+StockMovement
+├── id, inventoryItemId, movementType
+├── quantity, unit, unitCost, totalCost
+├── reason, reference (orderId, purchaseOrderId, wasteId)
+├── timestamp, userId, notes
+├── batchNumber, expiryDate
+└── runningTotal
+
+InventoryCategory
+├── id, name, description, parentId
+├── isActive, sortOrder
+└── items[] → InventoryItem
+```
+
+#### **Supplier & Purchasing System**
+```
+Supplier
+├── id, name, contactInfo, address
+├── paymentTerms, deliveryDays[], minimumOrder
+├── rating, isActive, notes
+├── supplierItems[] → SupplierItem
+└── purchaseOrders[] → PurchaseOrder
+
+SupplierItem
+├── id, supplierId, inventoryItemId
+├── supplierSku, supplierName, unitSize
+├── currentPrice, priceHistory[], pricePerUnit
+├── minimumOrderQuantity, leadTime
+├── isPreferred, lastOrderDate
+└── qualityRating
+
+PurchaseOrder
+├── id, orderNumber, supplierId, restaurantId
+├── orderDate, expectedDeliveryDate, actualDeliveryDate
+├── status, totalAmount, tax, shippingCost
+├── createdBy, approvedBy, receivedBy
+├── items[] → PurchaseOrderItem
+└── notes
+
+PurchaseOrderItem
+├── id, purchaseOrderId, inventoryItemId
+├── orderedQuantity, receivedQuantity, unitPrice
+├── totalPrice, quality, expiryDate
+└── notes
+```
+
+#### **Cost & Analytics System**
+```
+RecipeCost
+├── id, recipeId, calculatedDate
+├── ingredientCost, laborCost, overheadCost
+├── totalCost, costPerServing, profitMargin
+├── targetCost, variance
+└── costBreakdown[]
+
+MenuItemCost
+├── id, menuItemId, recipeId
+├── recipeCost, additionalCosts[], totalCost
+├── sellingPrice, grossProfit, profitMargin
+├── targetMargin, lastUpdated
+└── costHistory[]
+
+WasteTracking
+├── id, inventoryItemId, quantity, unit
+├── reason, cost, dateWasted, userId
+├── batchNumber, expiryDate
+└── notes
+```
+
+---
+
+## 2. API Endpoints Architecture
+
+### **Recipe Management Endpoints**
+
+#### Recipe CRUD Operations
+```
+GET    /api/recipes                           # List all recipes with filters
+POST   /api/recipes                           # Create new recipe
+GET    /api/recipes/:id                       # Get recipe by ID
+PUT    /api/recipes/:id                       # Update recipe
+DELETE /api/recipes/:id                       # Delete recipe
+GET    /api/recipes/:id/versions              # Get recipe version history
+POST   /api/recipes/:id/duplicate             # Duplicate recipe
+```
+
+#### Recipe Ingredients & Costing
+```
+GET    /api/recipes/:id/ingredients           # Get recipe ingredients
+POST   /api/recipes/:id/ingredients           # Add ingredient to recipe
+PUT    /api/recipes/:id/ingredients/:ingredientId  # Update recipe ingredient
+DELETE /api/recipes/:id/ingredients/:ingredientId  # Remove ingredient
+GET    /api/recipes/:id/cost                  # Calculate recipe cost
+POST   /api/recipes/:id/cost/recalculate      # Force cost recalculation
+```
+
+#### Recipe Yield Management
+```
+GET    /api/recipes/:id/yield                 # Get yield information
+PUT    /api/recipes/:id/yield                 # Update yield data
+POST   /api/recipes/:id/yield/actual          # Record actual yield
+GET    /api/recipes/:id/yield/history         # Get yield history
+POST   /api/recipes/:id/scale                 # Scale recipe quantities
+```
+
+### **Inventory Management Endpoints**
+
+#### Inventory Items CRUD
+```
+GET    /api/inventory                         # List inventory items
+POST   /api/inventory                         # Create inventory item
+GET    /api/inventory/:id                     # Get inventory item
+PUT    /api/inventory/:id                     # Update inventory item
+DELETE /api/inventory/:id                     # Delete inventory item
+GET    /api/inventory/low-stock               # Get low stock items
+GET    /api/inventory/categories              # Get inventory categories
+```
+
+#### Stock Management
+```
+GET    /api/inventory/:id/stock               # Get current stock level
+POST   /api/inventory/:id/stock/adjust        # Adjust stock level
+GET    /api/inventory/:id/movements           # Get stock movement history
+POST   /api/inventory/:id/movements           # Record stock movement
+GET    /api/inventory/movements               # Get all stock movements
+```
+
+#### Stock Alerts & Reordering
+```
+GET    /api/inventory/alerts                  # Get stock alerts
+POST   /api/inventory/:id/reorder-point       # Update reorder point
+GET    /api/inventory/reorder-suggestions     # Get reorder suggestions
+POST   /api/inventory/auto-reorder           # Create auto purchase orders
+```
+
+### **Supplier & Purchasing Endpoints**
+
+#### Supplier Management
+```
+GET    /api/suppliers                         # List suppliers
+POST   /api/suppliers                         # Create supplier
+GET    /api/suppliers/:id                     # Get supplier details
+PUT    /api/suppliers/:id                     # Update supplier
+DELETE /api/suppliers/:id                     # Delete supplier
+GET    /api/suppliers/:id/items               # Get supplier items
+POST   /api/suppliers/:id/items               # Add supplier item
+```
+
+#### Purchase Order Management
+```
+GET    /api/purchase-orders                   # List purchase orders
+POST   /api/purchase-orders                   # Create purchase order
+GET    /api/purchase-orders/:id               # Get purchase order
+PUT    /api/purchase-orders/:id               # Update purchase order
+POST   /api/purchase-orders/:id/approve       # Approve purchase order
+POST   /api/purchase-orders/:id/receive       # Receive purchase order
+GET    /api/purchase-orders/pending           # Get pending orders
+```
+
+### **Cost Analysis & Reporting Endpoints**
+
+#### Recipe Costing
+```
+GET    /api/recipes/:id/cost-analysis         # Detailed cost analysis
+POST   /api/recipes/bulk-cost-update          # Bulk update recipe costs
+GET    /api/menu-items/:id/cost-analysis      # Menu item cost analysis
+GET    /api/cost-analysis/variance            # Cost variance report
+```
+
+#### Inventory Analytics
+```
+GET    /api/analytics/inventory/value         # Inventory valuation
+GET    /api/analytics/inventory/turnover      # Inventory turnover rates
+GET    /api/analytics/waste                   # Waste analysis
+GET    /api/analytics/supplier-performance    # Supplier performance metrics
+GET    /api/analytics/cost-trends             # Cost trend analysis
+```
+
+---
+
+## 3. Core Features & Requirements
+
+### **Recipe Management Features**
+
+#### Recipe Creation & Standardization
+- [ ] **Recipe Builder Interface**
+  - Drag-and-drop ingredient addition
+  - Step-by-step instruction editor
+  - Photo/video attachment support
+  - Nutritional information calculator
+
+- [ ] **Recipe Standardization**
+  - Standardized measurements and units
+  - Conversion between different units
+  - Portion size standardization
+  - Scaling calculations (batch sizing)
+
+- [ ] **Recipe Versioning**
+  - Track recipe changes over time
+  - Compare recipe versions
+  - Roll back to previous versions
+  - Change approval workflow
+
+#### Yield Management
+- [ ] **Yield Tracking**
+  - Expected vs actual yield tracking
+  - Yield variance analysis
+  - Portion control optimization
+  - Waste reduction insights
+
+- [ ] **Recipe Scaling**
+  - Automatic scaling for different batch sizes
+  - Minimum/maximum batch constraints
+  - Scaling factor calculations
+  - Equipment capacity considerations
+
+### **Inventory Management Features**
+
+#### Stock Tracking
+- [ ] **Real-time Inventory**
+  - Live stock level updates
+  - Multi-location inventory tracking
+  - Batch/lot number tracking
+  - Expiry date management
+
+- [ ] **Automated Reordering**
+  - Configurable reorder points
+  - Automatic purchase order generation
+  - Supplier preference settings
+  - Seasonal demand adjustments
+
+#### Stock Operations
+- [ ] **Stock Movements**
+  - Receiving goods tracking
+  - Usage consumption tracking
+  - Transfer between locations
+  - Waste and spoilage tracking
+
+- [ ] **Inventory Counts**
+  - Physical count functionality
+  - Cycle counting schedules
+  - Variance reporting
+  - Count adjustment workflows
+
+### **Cost Management Features**
+
+#### Recipe Costing
+- [ ] **Ingredient Cost Tracking**
+  - Real-time ingredient pricing
+  - Cost per unit calculations
+  - Price history tracking
+  - Supplier price comparisons
+
+- [ ] **Recipe Cost Analysis**
+  - Total recipe cost calculation
+  - Cost per serving/portion
+  - Profit margin analysis
+  - Target cost vs actual cost
+
+#### Menu Pricing Optimization
+- [ ] **Dynamic Pricing**
+  - Cost-based pricing suggestions
+  - Profit margin targeting
+  - Competitive pricing analysis
+  - Seasonal price adjustments
+
+- [ ] **Profitability Analysis**
+  - Menu item profitability ranking
+  - Cost variance tracking
+  - Price change impact analysis
+  - Profitability trend analysis
+
+### **Supplier Management Features**
+
+#### Supplier Relationships
+- [ ] **Supplier Database**
+  - Supplier contact management
+  - Performance rating system
+  - Payment terms tracking
+  - Delivery schedule management
+
+- [ ] **Purchase Order Management**
+  - PO creation and approval workflow
+  - Delivery tracking
+  - Invoice matching
+  - Payment processing integration
+
+---
+
+## 4. Integration Points
+
+### **Existing INSEAT Platform Integration**
+
+#### Menu Item Integration
+- [ ] Link recipes to existing menu items
+- [ ] Update menu item costs automatically
+- [ ] Sync ingredient availability with menu item availability
+- [ ] Track menu item ingredient consumption
+
+#### Order Processing Integration
+- [ ] Deduct inventory on order completion
+- [ ] Track actual vs expected consumption
+- [ ] Generate inventory alerts based on order volume
+- [ ] Calculate real-time food costs
+
+#### Restaurant Management Integration
+- [ ] Multi-restaurant inventory management
+- [ ] Location-specific suppliers and pricing
+- [ ] Inter-location inventory transfers
+- [ ] Centralized purchasing for multiple locations
+
+#### Staff Integration
+- [ ] Role-based access for inventory management
+- [ ] Chef access to recipe management
+- [ ] Manager access to cost analysis
+- [ ] Staff training on standardized recipes
+
+---
+
+## 5. Implementation Phases
+
+### **Phase 1: Foundation (Weeks 1-4)**
+- [ ] Database schema design and implementation
+- [ ] Basic inventory item management
+- [ ] Recipe creation and management
+- [ ] Recipe-inventory item relationships
+- [ ] Basic stock movement tracking
+
+### **Phase 2: Core Features (Weeks 5-8)**
+- [ ] Supplier management system
+- [ ] Purchase order functionality
+- [ ] Recipe costing calculations
+- [ ] Basic inventory alerts
+- [ ] Stock adjustment workflows
+
+### **Phase 3: Advanced Features (Weeks 9-12)**
+- [ ] Yield tracking and optimization
+- [ ] Recipe scaling functionality
+- [ ] Advanced cost analysis
+- [ ] Automated reordering
+- [ ] Waste tracking system
+
+### **Phase 4: Analytics & Optimization (Weeks 13-16)**
+- [ ] Comprehensive reporting dashboard
+- [ ] Cost variance analysis
+- [ ] Profitability optimization tools
+- [ ] Supplier performance analytics
+- [ ] Predictive inventory management
+
+### **Phase 5: Integration & Refinement (Weeks 17-20)**
+- [ ] Complete INSEAT platform integration
+- [ ] Mobile app for inventory management
+- [ ] Barcode scanning functionality
+- [ ] Advanced automation features
+- [ ] Performance optimization
+
+---
+
+## 6. Key Performance Indicators (KPIs)
+
+### **Operational Metrics**
+- Inventory turnover rate
+- Stock-out frequency
+- Waste percentage
+- Recipe adherence rate
+- Order fulfillment accuracy
+
+### **Financial Metrics**
+- Food cost percentage
+- Gross profit margin
+- Cost variance by recipe
+- Inventory carrying cost
+- Supplier cost savings
+
+### **Efficiency Metrics**
+- Time to complete inventory counts
+- Purchase order processing time
+- Recipe preparation consistency
+- Inventory accuracy percentage
+- Supplier delivery performance
+
+---
+
+## 7. Risk Mitigation
+
+### **Data Accuracy Risks**
+- Implement validation rules for all data entry
+- Regular inventory audits and reconciliation
+- Staff training on proper procedures
+- Automated alerts for unusual variances
+
+### **Integration Risks**
+- Phased rollout approach
+- Extensive testing in development environment
+- Rollback procedures for each deployment
+- Staff training before go-live
+
+### **Operational Risks**
+- Backup procedures for system downtime
+- Manual override capabilities
+- Clear escalation procedures
+- Regular system health monitoring
+
+This comprehensive PRD provides the foundation for building a robust Recipe and Inventory Management system that will significantly enhance the INSEAT platform's capabilities while providing restaurants with the tools they need for effective cost control and operational efficiency.

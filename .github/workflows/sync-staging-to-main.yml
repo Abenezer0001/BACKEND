@@ -1,0 +1,28 @@
+name: Sync Staging to Main
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  sync-to-main:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Force update main branch with staging
+        run: |
+          git checkout main
+          git reset --hard origin/staging
+          git push --force-with-lease origin main

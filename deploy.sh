@@ -1,0 +1,238 @@
+#!/bin/bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to check if .env file exists and has required variables
+check_env_file() {
+    print_status "Checking environment configuration..."
+    
+    if [ ! -f .env.staging ]; then
+        print_error ".env.staging file not found! Please create one based on .env.example"
+        exit 1
+    fi
+    
+    # Check for critical environment variables
+    required_vars=("MONGO_URL" "JWT_SECRET" "GOOGLE_CLIENT_ID" "GOOGLE_CLIENT_SECRET")
+    missing_vars=()
+    
+    for var in "${required_vars[@]}"; do
+        if ! grep -q "^${var}=" .env.staging; then
+            missing_vars+=("$var")
+        fi
+    done
+    
+    if [ ${#missing_vars[@]} -ne 0 ]; then
+        print_error "Missing required environment variables in .env.staging file:"
+        for var in "${missing_vars[@]}"; do
+            echo "  - $var"
+        done
+        exit 1
+    fi
+    
+    print_success "Environment configuration looks good"
+}
+
+# Function to stop existing containers
+stop_containers() {
+    print_status "Stopping existing containers..."
+    
+    if docker compose ps -q > /dev/null 2>&1; then
+        docker compose down
+        print_success "Containers stopped"
+    else
+        print_warning "No running containers found"
+    fi
+}
+
+# Function to clean up old images (optional)
+cleanup_images() {
+    if [ "$1" = "--clean" ]; then
+        print_status "Cleaning up old Docker images..."
+        docker system prune -f
+        print_success "Docker cleanup completed"
+    fi
+}
+
+# Function to build the application
+build_app() {
+    print_status "Building Docker image..."
+    
+    if docker compose build --no-cache; then
+        print_success "Docker image built successfully"
+    else
+        print_error "Failed to build Docker image"
+        exit 1
+    fi
+}
+
+# Function to start the application
+start_app() {
+    print_status "Starting application..."
+    
+    if docker compose up -d; then
+        print_success "Application started successfully"
+    else
+        print_error "Failed to start application"
+        exit 1
+    fi
+}
+
+# Function to check application health
+check_health() {
+    print_status "Checking application health..."
+    
+    # Wait a bit for the container to start
+    sleep 10
+    
+    max_attempts=12
+    attempt=1
+    
+    while [ $attempt -le $max_attempts ]; do
+        if curl -f http://localhost:3002/health > /dev/null 2>&1; then
+            print_success "Application is healthy and responding"
+            return 0
+        fi
+        
+        print_status "Health check attempt $attempt/$max_attempts - waiting..."
+        sleep 5
+        ((attempt++))
+    done
+    
+    print_error "Application failed health check after $max_attempts attempts"
+    print_status "Checking logs..."
+    docker compose logs --tail 20
+    return 1
+}
+
+# Function to show environment variables in container
+check_container_env() {
+    print_status "Checking environment variables in container..."
+    
+    container_name=$(docker compose ps -q backend)
+    if [ -n "$container_name" ]; then
+        echo "Google OAuth variables:"
+        docker exec "$container_name" env | grep GOOGLE || print_warning "No Google environment variables found"
+        echo ""
+        echo "MongoDB variables:"
+        docker exec "$container_name" env | grep MONGO || print_warning "No MongoDB environment variables found"
+        echo ""
+        echo "JWT variables:"
+        docker exec "$container_name" env | grep JWT || print_warning "No JWT environment variables found"
+    else
+        print_error "Backend container not found"
+    fi
+}
+
+# Function to show status
+show_status() {
+    print_status "Current deployment status:"
+    echo ""
+    docker compose ps
+    echo ""
+    print_status "Container logs (last 10 lines):"
+    docker compose logs --tail 10
+}
+
+# Main deployment function
+main() {
+    echo "=================================================================================="
+    echo "                          INSEAT Backend Deployment                              "
+    echo "=================================================================================="
+    echo ""
+    
+    # Parse command line arguments
+    CLEAN_FLAG=""
+    SKIP_HEALTH=""
+    SHOW_ENV=""
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --clean)
+                CLEAN_FLAG="--clean"
+                shift
+                ;;
+            --skip-health)
+                SKIP_HEALTH="true"
+                shift
+                ;;
+            --show-env)
+                SHOW_ENV="true"
+                shift
+                ;;
+            --help)
+                echo "Usage: $0 [OPTIONS]"
+                echo ""
+                echo "Options:"
+                echo "  --clean        Clean up old Docker images"
+                echo "  --skip-health  Skip health check after deployment"
+                echo "  --show-env     Show environment variables in container"
+                echo "  --help         Show this help message"
+                echo ""
+                exit 0
+                ;;
+            *)
+                print_warning "Unknown option: $1"
+                shift
+                ;;
+        esac
+    done
+    
+    # Run deployment steps
+    check_env_file
+    stop_containers
+    cleanup_images $CLEAN_FLAG
+    build_app
+    start_app
+    
+    if [ "$SKIP_HEALTH" != "true" ]; then
+        if ! check_health; then
+            print_error "Deployment failed health check"
+            show_status
+            exit 1
+        fi
+    fi
+    
+    if [ "$SHOW_ENV" = "true" ]; then
+        check_container_env
+    fi
+    
+    show_status
+    
+    echo ""
+    echo "=================================================================================="
+    print_success "Deployment completed successfully!"
+    echo "Application is running on: http://localhost:3002"
+    echo "Health check endpoint: http://localhost:3002/health"
+    echo ""
+    echo "Useful commands:"
+    echo "  - View logs: docker compose logs -f"
+    echo "  - Check status: docker compose ps"
+    echo "  - Stop application: docker compose down"
+    echo "  - Restart: ./deploy.sh"
+    echo "=================================================================================="
+}
+
+# Run main function with all arguments
+main "$@"
