@@ -7,8 +7,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import WebSocketService from './services/WebSocketService';
-import kafkaProducerService from './services/KafkaProducer';
-import { KafkaConsumerService } from './services/KafkaConsumerService';
+// import kafkaProducerService from './services/KafkaProducer';
+// import { KafkaConsumerService } from './services/KafkaConsumerService';
 import LiveOrderMonitor from './services/LiveOrderMonitor';
 import orderRoutes from './routes/orderRoutes';
 import logger from './utils/logger';
@@ -64,7 +64,7 @@ async function initializeServices() {
     logger.info('Connected to MongoDB');
     
     // Initialize Kafka producer
-    await kafkaProducerService.initializeProducer();
+    // await kafkaProducerService.initializeProducer();
     
     // Initialize order monitoring
     const monitor = LiveOrderMonitor.getInstance();
@@ -86,10 +86,10 @@ const shutdown = async () => {
   
   try {
     // Stop Kafka consumer
-    await KafkaConsumerService.disconnect();
+    // await KafkaConsumerService.disconnect();
     
     // Stop Kafka producer
-    await kafkaProducerService.disconnect();
+    // await kafkaProducerService.disconnect();
     
     // Stop order monitoring
     const monitor = LiveOrderMonitor.getInstance();

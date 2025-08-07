@@ -10,9 +10,9 @@ interface Config {
   mongodb: {
     uri: string;
   };
-  kafka: {
-    clientId: string;
-    brokers: string[];
+  // kafka: {
+    // clientId: string;
+    // brokers: string[];
   };
   websocket: {
     port: number;
@@ -34,10 +34,10 @@ const config: Config = {
   mongodb: {
     uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/inseat'
   },
-  kafka: {
-    clientId: process.env.KAFKA_CLIENT_ID || 'order-service',
-    brokers: (process.env.KAFKA_BROKERS || 'localhost:9092').split(',')
-  },
+  // kafka: {
+  //   clientId: process.env.KAFKA_CLIENT_ID || 'order-service',
+  //   brokers: (process.env.KAFKA_BROKERS || 'localhost:9092').split(',')
+  // },
   websocket: {
     port: parseInt(process.env.WEBSOCKET_PORT || '3002', 10),
     cors: {

@@ -1,12 +1,12 @@
 import express, { Application } from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import { createOrderRoutes } from './routes/orderRoutes';
-import { KafkaConsumerService } from './services/KafkaConsumerService';
+// import { KafkaConsumerService } from './services/KafkaConsumerService';
 import { OrderSocketService } from './services/OrderSocketService';
-import kafkaService from './config/kafka';
+// import kafkaService from './config/kafka';
 import WebSocketService from './services/WebSocketService';
 
-let kafkaConsumerService: KafkaConsumerService | null = null;
+// let kafkaConsumerService: KafkaConsumerService | null = null;
 let orderSocketService: OrderSocketService | null = null;
 
 /**
@@ -35,8 +35,8 @@ export const initializeOrderService = (app: Application, io: SocketIOServer): vo
   app.use('/api/orders', routes);
 
   // Initialize Kafka consumer
-  kafkaConsumerService = new KafkaConsumerService();
-  kafkaConsumerService.startConsumer()
+  // kafkaConsumerService = new KafkaConsumerService();
+  // kafkaConsumerService.startConsumer()
     .then(() => {
       console.log('Kafka consumer started successfully');
     })
@@ -57,7 +57,7 @@ export const shutdownOrderService = async (): Promise<void> => {
   // Shutdown Kafka consumer if initialized
   if (kafkaConsumerService) {
     try {
-      await kafkaConsumerService.shutdown();
+      // await kafkaConsumerService.shutdown();
       console.log('Kafka consumer shut down successfully');
     } catch (error) {
       console.error('Error shutting down Kafka consumer:', error);
@@ -76,4 +76,4 @@ export const shutdownOrderService = async (): Promise<void> => {
 };
 
 // Export kafka service for external use
-export { kafkaService };
+// export { kafkaService };
