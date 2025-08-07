@@ -35,7 +35,7 @@ import { handleWebhook, checkSessionStatus } from './payment-service/controllers
 // Import Socket.IO instance directly from our socket singleton
 import { getSocketIO } from '../src/socketio';
 // Import AI service routes and initialization function
-import aiServiceRoutes, { initializeAIService } from './ai-service/src/index';
+// import aiServiceRoutes, { initializeAIService } from './ai-service/src/index';
 // Import loyalty service routes
 import loyaltyRoutes from './loyalty-service/src/routes/loyaltyRoutes';
 // Import both flexible and optional authentication middleware
@@ -340,7 +340,7 @@ router.use('/cashiers', cashierRoutes as unknown as Router); // Cashier manageme
 router.use('/schedules', scheduleRoutes as unknown as Router); // Schedule management routes at /api/schedules/*
 
 // AI Service routes
-router.use('/ai', aiServiceRoutes as unknown as Router);
+// router.use('/ai', aiServiceRoutes as unknown as Router);
 
 // Loyalty Service routes
 router.use('/loyalty', authenticateFlexible, loyaltyRoutes as unknown as Router);
@@ -660,7 +660,7 @@ router.get('/tables/:tableId/verify', async (req, res) => {
 export default router;
 
 // Export AI service initialization function for use in main app
-export { initializeAIService };
+// export { initializeAIService };
 
 // Export analytics service initialization function for use in main app
 export { initializeAnalyticsService };

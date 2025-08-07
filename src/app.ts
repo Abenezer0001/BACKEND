@@ -77,7 +77,7 @@ export { app, server };
 import Stripe from 'stripe';
 
 // Now we can safely import services
-import apiRoutes, { initializeAIService, initializeAnalyticsService, initializeInventoryService } from '../services/index';
+import apiRoutes, { initializeAnalyticsService, initializeInventoryService } from '../services/index';
 import adminRoutes from '../services/auth-service/src/routes/adminRoutes';
 import authRoutes from '../services/auth-service/src/routes/authRoutes';
 import rbacRoutes from '../services/auth-service/src/routes/rbacRoutes';
@@ -404,15 +404,15 @@ const connectWithRetry = async (retryCount = 0, maxRetries = 5) => {
     }
 
     // Initialize AI service after MongoDB connection is established
-    try {
-      await initializeAIService();
-      Log.info('AI service initialized successfully');
-    } catch (error) {
-      Log.error('Failed to initialize AI service', { 
-        error: error instanceof Error ? error.message : String(error)
-      });
-      Log.warn('AI service will have limited functionality');
-    }
+    // try {
+    //   await initializeAIService();
+    //   Log.info('AI service initialized successfully');
+    // } catch (error) {
+    //   Log.error('Failed to initialize AI service', { 
+    //     error: error instanceof Error ? error.message : String(error)
+    //   });
+    //   Log.warn('AI service will have limited functionality');
+    // }
 
     // Initialize Analytics service
     try {
