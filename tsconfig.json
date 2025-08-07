@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "es2020",
-    "lib": ["es2018"],
+    "module": "commonjs",
+    "lib": ["es2020"],
     "outDir": "./dist",
     "rootDir": ".",
     "strict": false,
@@ -24,5 +24,10 @@
     "typeRoots": ["./node_modules/@types", "./services/restaurant-service/src/types", "./services/auth-service/src/types", "./src/types"]
   },
   "include": ["src/**/*", "services/**/*", "utils/**/*", "services/restaurant-service/src/types/*.d.ts"],
-  "exclude": ["node_modules", "dist", "services/inventory-service"]
+  "exclude": ["node_modules", "dist", "services/inventory-service"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }
