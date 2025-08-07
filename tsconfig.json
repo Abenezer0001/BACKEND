@@ -20,7 +20,7 @@
       "@services/*": ["services/*"],
       "@utils/*": ["utils/*"]
     },
-    "types": ["node"],
+    "types": [],
     "typeRoots": ["./node_modules/@types", "./services/restaurant-service/src/types", "./services/auth-service/src/types", "./src/types"]
   },
   "include": ["src/**/*", "services/**/*", "utils/**/*", "services/restaurant-service/src/types/*.d.ts"],
