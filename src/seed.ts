@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Fix for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url || 'file://' + __filename);
+const __dirname = dirname(__filename);
 
 // Load environment variables from .env file located in the parent directory (Inseat-backend)
 dotenv.config({ path: path.resolve(__dirname, '../.env') });

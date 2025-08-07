@@ -1,5 +1,6 @@
 import { Server as SocketIOServer } from 'socket.io';
 import http from 'http';
+import * as process from 'process';
 
 // Global variable to hold the Socket.IO instance
 let io: SocketIOServer | null = null;

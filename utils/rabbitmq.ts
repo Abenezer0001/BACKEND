@@ -1,4 +1,5 @@
 import amqp, { Connection, Channel } from 'amqplib';
+import * as process from 'process';
 
 class RabbitMQService {
   private static instance: RabbitMQService;

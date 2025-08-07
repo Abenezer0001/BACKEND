@@ -1,5 +1,6 @@
 import { Server as HTTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
+import * as process from 'process';
 // Import Order model and interface from the correct path
 import OrderModel, { IOrder } from '../../services/order-service/src/models/Order';
 

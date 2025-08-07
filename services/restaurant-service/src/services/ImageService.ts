@@ -2,6 +2,7 @@ import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client, bucketName } from '../utils/s3Config';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import * as process from 'process';
 
 class ImageService {
   /**

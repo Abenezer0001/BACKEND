@@ -1,4 +1,5 @@
 import { Kafka, Producer, ProducerConfig } from 'kafkajs';
+import * as process from 'process';
 
 const kafka = new Kafka({
   clientId: 'inseat-service',

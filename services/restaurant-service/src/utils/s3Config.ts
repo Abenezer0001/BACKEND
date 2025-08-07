@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 import path from 'path';
+import * as process from 'process';
 
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
