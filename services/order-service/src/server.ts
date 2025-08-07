@@ -55,15 +55,15 @@ export const shutdownOrderService = async (): Promise<void> => {
   console.log('Shutting down Order Service...');
 
   // Shutdown Kafka consumer if initialized
-  if (kafkaConsumerService) {
-    try {
-      // await kafkaConsumerService.shutdown();
-      console.log('Kafka consumer shut down successfully');
-    } catch (error) {
-      console.error('Error shutting down Kafka consumer:', error);
-    }
-    kafkaConsumerService = null;
-  }
+  // if (kafkaConsumerService) {
+  //   try {
+  //     // await kafkaConsumerService.shutdown();
+  //     console.log('Kafka consumer shut down successfully');
+  //   } catch (error) {
+  //     console.error('Error shutting down Kafka consumer:', error);
+  //   }
+  //   kafkaConsumerService = null;
+  // }
 
   // Cleanup socket service if initialized
   if (orderSocketService) {
