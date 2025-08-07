@@ -37,16 +37,16 @@ import { getSocketIO } from '../src/socketio';
 // Import AI service routes and initialization function
 // import aiServiceRoutes, { initializeAIService } from './ai-service/src/index';
 // Import loyalty service routes
-import loyaltyRoutes from './loyalty-service/src/routes/loyaltyRoutes';
+// import loyaltyRoutes from './loyalty-service/src/routes/loyaltyRoutes';
 // Import both flexible and optional authentication middleware
 import { authenticateFlexible, authenticateOptional } from './auth-service/src/middleware/auth';
 // Import group ordering service routes
-import groupOrderRoutes from './group-ordering-service/src/routes/groupOrderRoutes';
+// import groupOrderRoutes from './group-ordering-service/src/routes/groupOrderRoutes';
 // Import inventory service initialization function
 import { initializeInventoryService } from './inventory-service/src/server';
 // Import analytics service
-import analyticsRoutes from './analytics-service/src/routes/analyticsRoutes';
-import { initializeAnalyticsService } from './analytics-service/src/server';
+// import analyticsRoutes from './analytics-service/src/routes/analyticsRoutes';
+// import { initializeAnalyticsService } from './analytics-service/src/server';
 // Import cash payment routes
 import cashPaymentRoutes from './restaurant-service/src/routes/cashPayment.routes'; // NEW: Cash payment routes       
 
@@ -109,7 +109,7 @@ router.use('/waiter-calls', authenticateOptional, waiterCallRoutes as unknown as
 router.use('/cash-payments', authenticateOptional, cashPaymentRoutes as unknown as Router);
 
 // NEW: Group ordering routes
-router.use('/group-orders', authenticateOptional, groupOrderRoutes as unknown as Router);
+// router.use('/group-orders', authenticateOptional, groupOrderRoutes as unknown as Router);
 
 // NEW: Mount business routes
 router.use('/', businessRoutes as unknown as Router); // For /api/admin/businesses/* and /api/businesses/* endpoints
@@ -343,7 +343,7 @@ router.use('/schedules', scheduleRoutes as unknown as Router); // Schedule manag
 // router.use('/ai', aiServiceRoutes as unknown as Router);
 
 // Loyalty Service routes
-router.use('/loyalty', authenticateFlexible, loyaltyRoutes as unknown as Router);
+// router.use('/loyalty', authenticateFlexible, loyaltyRoutes as unknown as Router);
 
 // Demo routes
 router.use('/demo', demoRoutes as unknown as Router);
@@ -385,7 +385,7 @@ router.use('/stripe-connect', stripeConnectRoutes as unknown as Router);
 console.log('Stripe Connect routes registered at /api/stripe-connect');
 
 // Analytics service routes
-router.use('/analytics', authenticateOptional, analyticsRoutes as unknown as Router);
+// router.use('/analytics', authenticateOptional, analyticsRoutes as unknown as Router);
 
 // Inventory service - using proper initializeInventoryService() from app.ts
 // Routes will be mounted via initializeInventoryService() function at /api/inventory/*
@@ -663,7 +663,7 @@ export default router;
 // export { initializeAIService };
 
 // Export analytics service initialization function for use in main app
-export { initializeAnalyticsService };
+// export { initializeAnalyticsService };
 
 // Export inventory service initialization function for use in main app
 export { initializeInventoryService };

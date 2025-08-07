@@ -77,7 +77,7 @@ export { app, server };
 import Stripe from 'stripe';
 
 // Now we can safely import services
-import apiRoutes, { initializeAnalyticsService, initializeInventoryService } from '../services/index';
+import apiRoutes, { initializeInventoryService } from '../services/index';
 import adminRoutes from '../services/auth-service/src/routes/adminRoutes';
 import authRoutes from '../services/auth-service/src/routes/authRoutes';
 import rbacRoutes from '../services/auth-service/src/routes/rbacRoutes';
@@ -416,7 +416,7 @@ const connectWithRetry = async (retryCount = 0, maxRetries = 5) => {
 
     // Initialize Analytics service
     try {
-      initializeAnalyticsService();
+      // initializeAnalyticsService();
       Log.info('Analytics service initialized successfully');
     } catch (error) {
       Log.error('Failed to initialize Analytics service', { 

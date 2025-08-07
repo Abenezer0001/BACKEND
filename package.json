@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Restaurant Management System Backend Services",
   "scripts": {
-    "build": "NODE_OPTIONS='--max-old-space-size=2048' tsc",
-    "start": "NODE_OPTIONS='--max-old-space-size=1024' node -r ts-node/register -r tsconfig-paths/register ./src/app.ts",
-    "start:compiled": "node ./dist/src/app.js",
+    "build": "tsc",
+    "start": "node ./dist/src/app.js",
+    "start:dev": "NODE_OPTIONS='--max-old-space-size=512' node -r ts-node/register -r tsconfig-paths/register ./src/app.ts",
     "dev": "nodemon",
     "dev:watch": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/app.ts",
     "typecheck": "tsc --noEmit",
