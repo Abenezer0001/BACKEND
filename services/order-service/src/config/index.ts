@@ -10,10 +10,6 @@ interface Config {
   mongodb: {
     uri: string;
   };
-  // kafka: {
-    // clientId: string;
-    // brokers: string[];
-  };
   websocket: {
     port: number;
     cors: {

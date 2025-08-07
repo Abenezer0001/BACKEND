@@ -37,12 +37,12 @@ export const initializeOrderService = (app: Application, io: SocketIOServer): vo
   // Initialize Kafka consumer
   // kafkaConsumerService = new KafkaConsumerService();
   // kafkaConsumerService.startConsumer()
-    .then(() => {
-      console.log('Kafka consumer started successfully');
-    })
-    .catch((error) => {
-      console.error('Failed to start Kafka consumer:', error);
-    });
+  //   .then(() => {
+  //     console.log('Kafka consumer started successfully');
+  //   })
+  //   .catch((error) => {
+  //     console.error('Failed to start Kafka consumer:', error);
+  //   });
 
   console.log('Order Service initialized successfully');
 };

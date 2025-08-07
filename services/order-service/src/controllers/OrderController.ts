@@ -1068,9 +1068,9 @@ export class OrderController {
 
         // Publish payment status changed event to Kafka
         // await KafkaProducerService.publishPaymentStatusChanged(
-          populatedOrder,
-          previousPaymentStatus
-        );
+        //   populatedOrder,
+        //   previousPaymentStatus
+        // );
       }
       
       res.status(200).json(populatedOrder);

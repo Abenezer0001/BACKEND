@@ -52,7 +52,8 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2",
     "uuid": "^11.1.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "@types/node": "^22.15.3"
   },
   "devDependencies": {
     "@prisma/client": "^6.5.0",
@@ -67,7 +68,6 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/mongoose": "^5.11.96",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.15.3",
     "@types/parse-path": "^7.1.0",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
