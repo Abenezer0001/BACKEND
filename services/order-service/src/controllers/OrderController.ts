@@ -6,7 +6,7 @@ import axios from 'axios'; // Added for inventory service integration
 import { INVENTORY_SERVICE_BASE_URL } from '../config/inventoryService'; // Added for inventory service URL
 import { GrubTechWebhookService } from '../services/GrubTechWebhookService';
 import { JWTPayload } from '../../../auth-service/src/types/auth.types';
-import { LoyaltyService } from '../../../loyalty-service/src/services/LoyaltyService';
+// import { LoyaltyService } from '../../../loyalty-service/src/services/LoyaltyService';
 
 // Create a custom User interface for order service that extends JWTPayload
 interface OrderServiceUser extends JWTPayload {
@@ -143,33 +143,33 @@ export class OrderController {
         
         // Calculate loyalty discount if customer is authenticated (not guest)
         let loyaltyDiscountAmount = 0;
-        if (orderData.userId && !orderData.isGuest) {
-          try {
-            console.log('Calculating loyalty discount for user:', orderData.userId);
-            const loyaltyResult = await LoyaltyService.calculateDiscount(
-              orderData.userId,
-              orderData.restaurantId,
-              subtotal
-            );
-            
-            if (loyaltyResult.isEligible && loyaltyResult.discount) {
-              loyaltyDiscountAmount = loyaltyResult.discount.discountAmount;
-              orderData.loyaltyDiscount = {
-                applied: true,
-                discountPercent: loyaltyResult.discount.discountPercent,
-                discountAmount: loyaltyDiscountAmount,
-                tier: loyaltyResult.discount.tier,
-                timeBonusPercent: loyaltyResult.discount.timeBonusPercent,
-                frequencyBonusPercent: loyaltyResult.discount.frequencyBonusPercent,
-                isFirstTime: loyaltyResult.discount.isFirstTime
-              };
-              console.log('Loyalty discount applied:', loyaltyDiscountAmount);
-            }
-          } catch (loyaltyError) {
-            console.error('Error calculating loyalty discount:', loyaltyError);
-            // Continue without loyalty discount if calculation fails
-          }
-        }
+        // if (orderData.userId && !orderData.isGuest) {
+        //   try {
+        //     console.log('Calculating loyalty discount for user:', orderData.userId);
+        //     // const loyaltyResult = await LoyaltyService.calculateDiscount(
+        //       orderData.userId,
+        //       orderData.restaurantId,
+        //       subtotal
+        //     );
+        //     
+        //     if (loyaltyResult.isEligible && loyaltyResult.discount) {
+        //       loyaltyDiscountAmount = loyaltyResult.discount.discountAmount;
+        //       orderData.loyaltyDiscount = {
+        //         applied: true,
+        //         discountPercent: loyaltyResult.discount.discountPercent,
+        //         discountAmount: loyaltyDiscountAmount,
+        //         tier: loyaltyResult.discount.tier,
+        //         timeBonusPercent: loyaltyResult.discount.timeBonusPercent,
+        //         frequencyBonusPercent: loyaltyResult.discount.frequencyBonusPercent,
+        //         isFirstTime: loyaltyResult.discount.isFirstTime
+        //       };
+        //       console.log('Loyalty discount applied:', loyaltyDiscountAmount);
+        //     }
+        //   } catch (loyaltyError) {
+        //     console.error('Error calculating loyalty discount:', loyaltyError);
+        //     // Continue without loyalty discount if calculation fails
+        //   }
+        // }
         
         // Calculate service charge - use provided value or fetch from restaurant settings
         let serviceChargeAmount = 0;
@@ -1029,30 +1029,30 @@ export class OrderController {
       order.paymentStatus = paymentStatus as PaymentStatus;
       
       // Apply loyalty discount when payment is successful
-      if (paymentStatus === PaymentStatus.PAID && 
-          order.loyaltyDiscount?.applied && 
-          order.userId && 
-          !order.isGuest) {
-        try {
-          console.log('Applying loyalty discount for paid order:', id);
-          const loyaltyResult = await LoyaltyService.applyDiscount(
-            order.userId.toString(),
-            order.restaurantId.toString(),
-            order.subtotal,
-            order.loyaltyDiscount.discountAmount,
-            order.loyaltyDiscount.discountPercent
-          );
-          
-          if (loyaltyResult.success) {
-            console.log('Loyalty discount successfully applied and visit recorded');
-          } else {
-            console.error('Failed to apply loyalty discount:', loyaltyResult.error);
-          }
-        } catch (loyaltyError) {
-          console.error('Error applying loyalty discount:', loyaltyError);
-          // Don't fail the payment update if loyalty fails
-        }
-      }
+      // if (paymentStatus === PaymentStatus.PAID && 
+      //     order.loyaltyDiscount?.applied && 
+      //     order.userId && 
+      //     !order.isGuest) {
+      //   try {
+      //     console.log('Applying loyalty discount for paid order:', id);
+      //     // const loyaltyResult = await LoyaltyService.applyDiscount(
+      //       order.userId.toString(),
+      //       order.restaurantId.toString(),
+      //       order.subtotal,
+      //       order.loyaltyDiscount.discountAmount,
+      //       order.loyaltyDiscount.discountPercent
+      //     );
+      //     
+      //     if (loyaltyResult.success) {
+      //       console.log('Loyalty discount successfully applied and visit recorded');
+      //     } else {
+      //       console.error('Failed to apply loyalty discount:', loyaltyResult.error);
+      //     }
+      //   } catch (loyaltyError) {
+      //     console.error('Error applying loyalty discount:', loyaltyError);
+      //     // Don't fail the payment update if loyalty fails
+      //   }
+      // }
       
       const updatedOrder = await order.save();
       

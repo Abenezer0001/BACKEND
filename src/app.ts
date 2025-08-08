@@ -100,7 +100,7 @@ import scheduleRoutes from '../services/auth-service/src/routes/scheduleRoutes';
 import { initializeRatingService } from '../services/rating-service/src/server';
 import { initializeTippingService } from '../services/tipping-service/src/server';
 import { initializeDiscoveryService } from '../services/discovery-service/src/server';
-import { initializeGroupOrderingService } from '../services/group-ordering-service/src/server';
+// import { initializeGroupOrderingService } from '../services/group-ordering-service/src/server';
 
 // Configure middleware
 // Get allowed origins from environment variable
@@ -465,7 +465,7 @@ const connectWithRetry = async (retryCount = 0, maxRetries = 5) => {
     }
 
     try {
-      initializeGroupOrderingService(app, io);
+      // initializeGroupOrderingService(app, io);
       Log.info('Group ordering service initialized successfully');
     } catch (error) {
       Log.error('Failed to initialize group ordering service', { 
